@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Games | MindSpace{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">BRAIN EXERCISE</p>
+    <h1>Choose a game 🧠</h1>
+    <p>Take your time. There is no need to rush.</p>
+</section>
+
+<div class="game-grid">
+    <a class="game-card" href="{{ url_for('game', game_name='sequence') }}">
+        <span class="game-icon">🔢</span>
+        <h2>Sequence Memory</h2>
+        <p>Remember and repeat a sequence of blocks.</p>
+        <span class="difficulty-label">Easy · Medium · Hard</span>
+    </a>
+
+    <a class="game-card" href="{{ url_for('game', game_name='picture') }}">
+        <span class="game-icon">🖼️</span>
+        <h2>Remember the Picture</h2>
+        <p>Look carefully and remember what you saw.</p>
+        <span class="difficulty-label">Easy · Medium · Hard</span>
+    </a>
+
+    <a class="game-card" href="{{ url_for('game', game_name='objects') }}">
+        <span class="game-icon">🧩</span>
+        <h2>Object Matching</h2>
+        <p>Match everyday objects that belong together.</p>
+        <span class="difficulty-label">Easy · Medium · Hard</span>
+    </a>
+
+    <a class="game-card" href="{{ url_for('game', game_name='routine') }}">
+        <span class="game-icon">📅</span>
+        <h2>Daily Routine Recall</h2>
+        <p>Remember simple events from a daily routine.</p>
+        <span class="difficulty-label">Easy · Medium · Hard</span>
+    </a>
+
+    <a class="game-card" href="{{ url_for('game', game_name='words') }}">
+        <span class="game-icon">🔤</span>
+        <h2>Word Recall</h2>
+        <p>Remember a small group of familiar words.</p>
+        <span class="difficulty-label">Easy · Medium · Hard</span>
+    </a>
+</div>
+{% endblock %}

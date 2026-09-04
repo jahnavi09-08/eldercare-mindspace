@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MindSpace{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game-extra.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-icon">🌿</span>
+            <span>MindSpace</span>
+        </a>
+
+        <nav class="nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('games') }}">Games</a>
+            <a href="{{ url_for('reminders') }}">Reminders</a>
+            <a href="{{ url_for('progress') }}">Progress</a>
+            <a href="{{ url_for('activities') }}">Activities</a>
+        </nav>
+
+        <a class="profile-button" href="{{ url_for('profile') }}">👤</a>
+    </header>
+
+    <main class="page-container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <span>🌿 MindSpace</span>
+        <span>Simple. Calm. Caring.</span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

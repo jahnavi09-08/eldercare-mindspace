@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Game | MindSpace{% endblock %}
+
+{% block content %}
+<section class="game-screen">
+    <a class="back-link" href="{{ url_for('games') }}">← Back to Games</a>
+
+    <div class="game-title">
+        <p class="eyebrow">BRAIN EXERCISE</p>
+        <h1 id="gameTitle">Loading game...</h1>
+        <p id="gameDescription">Choose a difficulty to begin.</p>
+    </div>
+
+    <div class="difficulty-tabs">
+        <button class="difficulty-button active" data-difficulty="easy">Easy</button>
+        <button class="difficulty-button" data-difficulty="medium">Medium</button>
+        <button class="difficulty-button" data-difficulty="hard">Hard</button>
+    </div>
+
+    <div id="gameArea" class="game-area">
+        <div class="start-card">
+            <div class="big-game-icon">🧠</div>
+            <h2>Ready?</h2>
+            <p>Take your time and do your best.</p>
+            <button id="startGameButton" class="primary-button">Start Game</button>
+        </div>
+    </div>
+
+    <div id="gameMessage" class="game-message"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.CURRENT_GAME = {{ game_name|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/games.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Reminders | MindSpace{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">STAY ON TRACK</p>
+    <h1>Today's reminders ⏰</h1>
+    <p>Small reminders can make the day easier.</p>
+</section>
+
+<div class="two-column">
+    <section>
+        <div id="reminderList" class="stack-list">
+            <div class="loading">Loading reminders...</div>
+        </div>
+    </section>
+
+    <aside class="form-card">
+        <h2>Add a reminder</h2>
+        <form id="reminderForm">
+            <label>What should we remember?</label>
+            <input id="reminderTitle" required placeholder="Example: Take medicine">
+
+            <label>Time</label>
+            <input id="reminderTime" type="time" required>
+
+            <label>Type</label>
+            <select id="reminderType">
+                <option>Health</option>
+                <option>Activity</option>
+                <option>Wellness</option>
+                <option>Brain</option>
+            </select>
+
+            <label>Note</label>
+            <textarea id="reminderDescription" placeholder="Optional note"></textarea>
+
+            <button class="primary-button" type="submit">+ Add Reminder</button>
+        </form>
+    </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
+{% endblock %}

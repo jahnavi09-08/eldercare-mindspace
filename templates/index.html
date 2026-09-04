@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Home | MindSpace{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">WELCOME BACK</p>
+        <h1>Good morning, Ravi 👋</h1>
+        <p class="hero-text">
+            Let's make today a little brighter with a few simple activities.
+        </p>
+    </div>
+    <div class="mood-card">
+        <p>How are you feeling?</p>
+        <div class="moods">
+            <button>😊</button>
+            <button>😐</button>
+            <button>😔</button>
+        </div>
+    </div>
+</section>
+
+<section class="featured-game">
+    <div class="featured-icon">🧠</div>
+    <div class="featured-copy">
+        <p class="eyebrow">TODAY'S BRAIN EXERCISE</p>
+        <h2>Sequence Memory</h2>
+        <p>Remember a short sequence of blocks and repeat it.</p>
+        <a class="primary-button" href="{{ url_for('game', game_name='sequence') }}">
+            Start Game →
+        </a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">TODAY</p>
+            <h2>Your plan</h2>
+        </div>
+        <a href="{{ url_for('reminders') }}">See all →</a>
+    </div>
+
+    <div class="dashboard-grid">
+        <article class="info-card">
+            <div class="card-icon">⏰</div>
+            <h3>Next Reminder</h3>
+            <strong>Evening Walk</strong>
+            <p>Today at 6:00 PM</p>
+        </article>
+
+        <article class="info-card">
+            <div class="card-icon">🏃</div>
+            <h3>Activity</h3>
+            <strong>Gentle Stretching</strong>
+            <p>5 minutes</p>
+        </article>
+
+        <article class="info-card">
+            <div class="card-icon">📊</div>
+            <h3>Progress</h3>
+            <strong>Keep going!</strong>
+            <p>Your recent sessions are saved automatically.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">EXPLORE</p>
+            <h2>What would you like to do?</h2>
+        </div>
+    </div>
+
+    <div class="quick-grid">
+        <a class="quick-card" href="{{ url_for('games') }}">
+            <span>🧠</span>
+            <strong>Play a Game</strong>
+            <small>Exercise your memory</small>
+        </a>
+        <a class="quick-card" href="{{ url_for('reminders') }}">
+            <span>⏰</span>
+            <strong>View Reminders</strong>
+            <small>Stay on track</small>
+        </a>
+        <a class="quick-card" href="{{ url_for('activities') }}">
+            <span>🚶</span>
+            <strong>Daily Activity</strong>
+            <small>Move gently</small>
+        </a>
+        <a class="quick-card" href="{{ url_for('progress') }}">
+            <span>📈</span>
+            <strong>My Progress</strong>
+            <small>See your journey</small>
+        </a>
+    </div>
+</section>
+{% endblock %}

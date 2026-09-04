@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Activities | MindSpace{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">GENTLE MOVEMENT</p>
+    <h1>Today's activities 🚶</h1>
+    <p>Choose a gentle activity and take it at your own pace.</p>
+</section>
+
+<div id="activityList" class="activity-grid">
+    <div class="loading">Loading activities...</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadActivities() {
+    const response = await fetch("/api/activities");
+    const activities = await response.json();
+    const list = document.getElementById("activityList");
+
+    list.innerHTML = activities.map(item => `
+        <article class="activity-card ${item.completed ? "completed" : ""}">
+            <div class="activity-icon">🏃</div>
+            <div>
+                <p class="time">${item.scheduled_time}</p>
+                <h2>${item.activity_name}</h2>
+                <p>${item.duration} minutes</p>
+            </div>
+            <button class="secondary-button"
+                onclick="completeActivity(${item.id})"
+                ${item.completed ? "disabled" : ""}>
+                ${item.completed ? "✓ Done" : "Mark Done"}
+            </button>
+        </article>
+    `).join("");
+}
+
+async function completeActivity(id) {
+    await fetch(`/api/activities/${id}/complete`, { method: "POST" });
+    loadActivities();
+}
+
+loadActivities();
+</script>
+{% endblock %}

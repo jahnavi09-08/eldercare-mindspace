@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Progress | MindSpace{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">YOUR JOURNEY</p>
+    <h1>Your progress 📊</h1>
+    <p>Every little step counts.</p>
+</section>
+
+<div class="stats-grid">
+    <article class="stat-card">
+        <span>🧠</span>
+        <strong id="gamesPlayed">0</strong>
+        <p>Games Played</p>
+    </article>
+
+    <article class="stat-card">
+        <span>🎯</span>
+        <strong id="averageAccuracy">0%</strong>
+        <p>Average Accuracy</p>
+    </article>
+
+    <article class="stat-card">
+        <span>🌱</span>
+        <strong>Keep Going</strong>
+        <p>Consistency matters</p>
+    </article>
+</div>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">RECENT SESSIONS</p>
+            <h2>Game history</h2>
+        </div>
+    </div>
+
+    <div id="progressList" class="stack-list">
+        <div class="loading">Loading progress...</div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+{% endblock %}
