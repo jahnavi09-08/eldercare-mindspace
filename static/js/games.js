@@ -3,52 +3,39 @@
    Complete Game Engine
    ========================================================= */
 
-
-/* =========================================================
-   GAME CONFIGURATION
-   ========================================================= */
-
 const GAME_CONFIG = {
-
     sequence: {
         title: "Sequence Memory",
-        description:
-            "Remember the highlighted blocks and repeat the same sequence."
+        description: "Remember the highlighted blocks and repeat the same sequence."
     },
 
     picture: {
         title: "Remember the Picture",
-        description:
-            "Look carefully, remember the objects, then choose what you saw."
+        description: "Look carefully, remember the objects, then choose what you saw."
     },
 
     objects: {
         title: "Object Matching",
-        description:
-            "Match everyday objects that naturally belong together."
+        description: "Match everyday objects that naturally belong together."
     },
 
     routine: {
         title: "Daily Routine Recall",
-        description:
-            "Remember a simple daily routine and answer questions about it."
+        description: "Remember a simple daily routine and answer questions about it."
     },
 
     words: {
         title: "Word Recall",
-        description:
-            "Remember familiar words and identify them after they disappear."
+        description: "Remember familiar words and identify them after they disappear."
     }
-
 };
 
 
 /* =========================================================
-   GENERAL DIFFICULTY SETTINGS
+   DIFFICULTY
    ========================================================= */
 
 const DIFFICULTY = {
-
     easy: {
         items: 4,
         displayTime: 6000
@@ -63,9 +50,7 @@ const DIFFICULTY = {
         items: 8,
         displayTime: 4000
     }
-
 };
-
 
 let currentDifficulty = "easy";
 
@@ -74,21 +59,10 @@ let currentDifficulty = "easy";
    COMMON ELEMENTS
    ========================================================= */
 
-const gameTitle =
-    document.getElementById("gameTitle");
-
-const gameDescription =
-    document.getElementById("gameDescription");
-
-const gameArea =
-    document.getElementById("gameArea");
-
-const gameMessage =
-    document.getElementById("gameMessage");
-
-const startButton =
-    document.getElementById("startGameButton");
-
+const gameTitle = document.getElementById("gameTitle");
+const gameDescription = document.getElementById("gameDescription");
+const gameArea = document.getElementById("gameArea");
+const gameMessage = document.getElementById("gameMessage");
 
 const config =
     GAME_CONFIG[window.CURRENT_GAME] ||
@@ -96,7 +70,7 @@ const config =
 
 
 /* =========================================================
-   INITIALIZE PAGE
+   INITIALIZE
    ========================================================= */
 
 if (gameTitle) {
@@ -104,8 +78,33 @@ if (gameTitle) {
 }
 
 if (gameDescription) {
-    gameDescription.textContent =
-        config.description;
+    gameDescription.textContent = config.description;
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+
+function randomItems(items, count) {
+    return [...items]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, count);
+}
+
+
+function escapeHTML(text) {
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -113,76 +112,42 @@ if (gameDescription) {
    DIFFICULTY BUTTONS
    ========================================================= */
 
-document
-    .querySelectorAll(".difficulty-button")
-    .forEach(button => {
+document.querySelectorAll(".difficulty-button").forEach(button => {
 
-        button.addEventListener(
-            "click",
-            () => {
+    button.addEventListener("click", () => {
 
-                document
-                    .querySelectorAll(
-                        ".difficulty-button"
-                    )
-                    .forEach(item => {
+        document
+            .querySelectorAll(".difficulty-button")
+            .forEach(item => item.classList.remove("active"));
 
-                        item.classList.remove(
-                            "active"
-                        );
+        button.classList.add("active");
 
-                    });
+        currentDifficulty = button.dataset.difficulty;
 
-
-                button.classList.add("active");
-
-
-                currentDifficulty =
-                    button.dataset.difficulty;
-
-
-                resetGame();
-
-            }
-        );
-
+        resetGame();
     });
 
-
-/* =========================================================
-   INITIAL START BUTTON
-   ========================================================= */
-
-if (startButton) {
-
-    startButton.addEventListener(
-        "click",
-        startGame
-    );
-
-}
+});
 
 
 /* =========================================================
-   RESET GAME
+   RESET
    ========================================================= */
 
 function resetGame() {
 
-    gameMessage.textContent = "";
-
+    if (gameMessage) {
+        gameMessage.textContent = "";
+    }
 
     gameArea.innerHTML = `
-
         <div class="start-card">
 
             <div class="big-game-icon">
                 🧠
             </div>
 
-            <h2>
-                Ready?
-            </h2>
+            <h2>Ready?</h2>
 
             <p>
                 ${capitalize(currentDifficulty)}
@@ -192,23 +157,15 @@ function resetGame() {
             <button
                 id="startGameButton"
                 class="primary-button">
-
                 Start Game
-
             </button>
 
         </div>
-
     `;
-
 
     document
         .getElementById("startGameButton")
-        .addEventListener(
-            "click",
-            startGame
-        );
-
+        .addEventListener("click", startGame);
 }
 
 
@@ -216,99 +173,39 @@ function resetGame() {
    START GAME
    ========================================================= */
 
+const originalStartButton =
+    document.getElementById("startGameButton");
+
+if (originalStartButton) {
+    originalStartButton.addEventListener("click", startGame);
+}
+
+
 function startGame() {
 
-    gameMessage.textContent = "";
-
+    if (gameMessage) {
+        gameMessage.textContent = "";
+    }
 
     const handlers = {
-
-        sequence:
-            playSequenceGame,
-
-        picture:
-            playPictureGame,
-
-        objects:
-            playObjectGame,
-
-        routine:
-            playRoutineGame,
-
-        words:
-            playWordGame
-
+        sequence: playSequenceGame,
+        picture: playPictureGame,
+        objects: playObjectGame,
+        routine: playRoutineGame,
+        words: playWordGame
     };
-
 
     const selectedGame =
         handlers[window.CURRENT_GAME];
 
-
     if (selectedGame) {
-
         selectedGame();
-
+    } else {
+        console.error(
+            "Unknown game:",
+            window.CURRENT_GAME
+        );
     }
-
-}
-
-
-/* =========================================================
-   RANDOM ITEMS
-   ========================================================= */
-
-function randomItems(items, count) {
-
-    return [...items]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, count);
-
-}
-
-
-/* =========================================================
-   RANDOM ITEM
-   ========================================================= */
-
-function randomItem(items) {
-
-    return items[
-        Math.floor(
-            Math.random() * items.length
-        )
-    ];
-
-}
-
-
-/* =========================================================
-   CAPITALIZE
-   ========================================================= */
-
-function capitalize(text) {
-
-    return (
-        text.charAt(0).toUpperCase() +
-        text.slice(1)
-    );
-
-}
-
-
-/* =========================================================
-   SAFE HTML TEXT
-   ========================================================= */
-
-function escapeHTML(text) {
-
-    return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
 }
 
 
@@ -319,47 +216,47 @@ function escapeHTML(text) {
 
 function playSequenceGame() {
 
+    /*
+       IMPORTANT:
+       These are actual colors, not CSS class names.
+       This fixes the Medium/Hard invisible block problem.
+    */
+
+    const blockColors = [
+        "#D9EBDD",
+        "#CFE4D4",
+        "#E5E0C8",
+        "#DCE8E1",
+        "#D8E1EE",
+        "#E8D9D9",
+        "#E2E0D5",
+        "#D5E5E0"
+    ];
 
     const settings = {
 
         easy: {
-
             blocks: 4,
-
             sequenceLength: 4,
-
             flashTime: 700,
-
             gapTime: 300
-
         },
 
         medium: {
-
             blocks: 8,
-
             sequenceLength: 8,
-
-            flashTime: 500,
-
-            gapTime: 220
-
+            flashTime: 550,
+            gapTime: 250
         },
 
         hard: {
-
-            blocks: 20,
-
-            sequenceLength: 20,
-
-            flashTime: 350,
-
-            gapTime: 150
-
+            blocks: 12,
+            sequenceLength: 12,
+            flashTime: 450,
+            gapTime: 220
         }
 
     };
-
 
     const level =
         settings[currentDifficulty];
@@ -371,7 +268,6 @@ function playSequenceGame() {
 
     const sequence = [];
 
-
     for (
         let i = 0;
         i < level.sequenceLength;
@@ -380,30 +276,22 @@ function playSequenceGame() {
 
         let next;
 
-
         do {
-
-            next =
-                Math.floor(
-                    Math.random() *
-                    level.blocks
-                );
-
-        } while (
-
+            next = Math.floor(
+                Math.random() * level.blocks
+            );
+        }
+        while (
             i > 0 &&
             next === sequence[i - 1]
-
         );
 
-
         sequence.push(next);
-
     }
 
 
     /* -----------------------------------------------------
-       Game screen
+       Create board
        ----------------------------------------------------- */
 
     gameArea.innerHTML = `
@@ -419,64 +307,48 @@ function playSequenceGame() {
                 MEMORY CHALLENGE
             </p>
 
-
             <h2 id="instruction">
                 Get ready 👀
             </h2>
-
 
             <p id="sequenceProgress">
                 Watch carefully...
             </p>
 
-
             <div
                 id="sequenceBoard"
                 class="sequence-board"
-
                 style="
                     display:grid;
-
                     grid-template-columns:
-                    repeat(
-                        ${level.blocks <= 4 ? 2 : 4},
-                        1fr
-                    );
-
-                    gap:12px;
-
+                        repeat(
+                            ${level.blocks <= 4 ? 2 : 4},
+                            minmax(0, 1fr)
+                        );
+                    gap:14px;
+                    width:100%;
                     max-width:520px;
-
                     margin:25px auto;
                 "
             >
             </div>
 
         </div>
-
     `;
 
 
     const board =
-        document.getElementById(
-            "sequenceBoard"
-        );
-
+        document.getElementById("sequenceBoard");
 
     const instruction =
-        document.getElementById(
-            "instruction"
-        );
-
+        document.getElementById("instruction");
 
     const progress =
-        document.getElementById(
-            "sequenceProgress"
-        );
+        document.getElementById("sequenceProgress");
 
 
     /* -----------------------------------------------------
-       Create blocks
+       Create visible blocks
        ----------------------------------------------------- */
 
     for (
@@ -488,14 +360,12 @@ function playSequenceGame() {
         const block =
             document.createElement("button");
 
+        block.type = "button";
 
         block.className =
-            `memory-block block-${i}`;
+            "memory-block";
 
-
-        block.dataset.index =
-            i;
-
+        block.dataset.index = i;
 
         block.setAttribute(
             "aria-label",
@@ -503,8 +373,42 @@ function playSequenceGame() {
         );
 
 
-        board.appendChild(block);
+        /*
+           Explicit styling.
+           This makes sure blocks are visible even if
+           game-extra.css has conflicting styles.
+        */
 
+        block.style.display = "block";
+        block.style.width = "100%";
+        block.style.height = "78px";
+        block.style.minHeight = "78px";
+
+        block.style.padding = "0";
+
+        block.style.boxSizing = "border-box";
+
+        block.style.border =
+            "3px solid #B8C9BE";
+
+        block.style.borderRadius =
+            "16px";
+
+        block.style.backgroundColor =
+            blockColors[
+                i % blockColors.length
+            ];
+
+        block.style.cursor = "pointer";
+
+        block.style.appearance = "none";
+        block.style.webkitAppearance = "none";
+
+        block.style.transition =
+            "background-color .18s ease, transform .18s ease, border-color .18s ease";
+
+
+        board.appendChild(block);
     }
 
 
@@ -517,7 +421,6 @@ function playSequenceGame() {
 
     function showNext() {
 
-
         if (
             position >=
             sequence.length
@@ -526,18 +429,15 @@ function playSequenceGame() {
             instruction.textContent =
                 "Now repeat the sequence 🧠";
 
-
             progress.textContent =
                 `Tap ${sequence.length} blocks in the same order.`;
 
-
             enableSequenceInput(
-                sequence
+                sequence,
+                blockColors
             );
 
-
             return;
-
         }
 
 
@@ -551,29 +451,41 @@ function playSequenceGame() {
             ];
 
 
-        block.classList.add("lit");
+        /* Flash */
+
+        block.style.backgroundColor =
+            "#4D765D";
+
+        block.style.borderColor =
+            "#385842";
+
+        block.style.transform =
+            "scale(1.04)";
 
 
-        setTimeout(
-            () => {
+        setTimeout(() => {
 
-                block.classList.remove(
-                    "lit"
-                );
+            block.style.backgroundColor =
+                blockColors[
+                    sequence[position] %
+                    blockColors.length
+                ];
+
+            block.style.borderColor =
+                "#B8C9BE";
+
+            block.style.transform =
+                "scale(1)";
 
 
-                position++;
+            position++;
 
+            setTimeout(
+                showNext,
+                level.gapTime
+            );
 
-                setTimeout(
-                    showNext,
-                    level.gapTime
-                );
-
-            },
-            level.flashTime
-        );
-
+        }, level.flashTime);
     }
 
 
@@ -581,7 +493,6 @@ function playSequenceGame() {
         showNext,
         1000
     );
-
 }
 
 
@@ -589,20 +500,20 @@ function playSequenceGame() {
    SEQUENCE INPUT
    ========================================================= */
 
-function enableSequenceInput(sequence) {
-
+function enableSequenceInput(
+    sequence,
+    blockColors
+) {
 
     const board =
         document.getElementById(
             "sequenceBoard"
         );
 
-
     const instruction =
         document.getElementById(
             "instruction"
         );
-
 
     const progress =
         document.getElementById(
@@ -612,22 +523,18 @@ function enableSequenceInput(sequence) {
 
     let userSequence = [];
 
+    let finished = false;
 
     const startTime =
         Date.now();
 
 
-    let finished = false;
-
-
-    [...board.children]
-        .forEach(block => {
-
+    [...board.children].forEach(
+        block => {
 
             block.addEventListener(
                 "click",
                 () => {
-
 
                     if (finished) {
                         return;
@@ -645,21 +552,33 @@ function enableSequenceInput(sequence) {
                     );
 
 
-                    block.classList.add(
-                        "lit"
-                    );
+                    /* Small tap flash */
+
+                    block.style.backgroundColor =
+                        "#4D765D";
+
+                    block.style.borderColor =
+                        "#385842";
+
+                    block.style.transform =
+                        "scale(1.04)";
 
 
-                    setTimeout(
-                        () => {
+                    setTimeout(() => {
 
-                            block.classList.remove(
-                                "lit"
-                            );
+                        block.style.backgroundColor =
+                            blockColors[
+                                index %
+                                blockColors.length
+                            ];
 
-                        },
-                        180
-                    );
+                        block.style.borderColor =
+                            "#B8C9BE";
+
+                        block.style.transform =
+                            "scale(1)";
+
+                    }, 180);
 
 
                     const position =
@@ -670,86 +589,71 @@ function enableSequenceInput(sequence) {
                         `${userSequence.length} of ${sequence.length}`;
 
 
-                    /* -------------------------------------
+                    /* -------------------------------------------------
                        Wrong answer
-                       ------------------------------------- */
+                       ------------------------------------------------- */
 
                     if (
                         userSequence[position] !==
                         sequence[position]
                     ) {
 
-
                         finished = true;
-
 
                         const correctSteps =
                             userSequence.length - 1;
 
-
                         const accuracy =
-                            Math.round(
-                                (
-                                    correctSteps /
-                                    sequence.length
-                                ) * 100
+                            Math.max(
+                                0,
+                                Math.round(
+                                    (
+                                        correctSteps /
+                                        sequence.length
+                                    ) * 100
+                                )
                             );
 
 
                         finishGame(
-
                             `You remembered ${correctSteps} of ${sequence.length}. 🌿`,
-
                             accuracy,
-
                             sequence.length,
-
                             Date.now() - startTime
-
                         );
 
-
                         return;
-
                     }
 
 
-                    /* -------------------------------------
+                    /* -------------------------------------------------
                        Complete
-                       ------------------------------------- */
+                       ------------------------------------------------- */
 
                     if (
                         userSequence.length ===
                         sequence.length
                     ) {
 
-
                         finished = true;
 
-
                         finishGame(
-
                             "Wonderful! You remembered the whole sequence! 🎉",
-
                             100,
-
                             sequence.length,
-
                             Date.now() - startTime
-
                         );
-
                     }
 
                 }
             );
 
-        });
+        }
+    );
 
 
     instruction.textContent =
         "Your turn — remember the order!";
-
 }
 
 
@@ -760,9 +664,7 @@ function enableSequenceInput(sequence) {
 
 function playPictureGame() {
 
-
     const objects = [
-
         "🚲",
         "🍎",
         "🌸",
@@ -783,7 +685,6 @@ function playPictureGame() {
         "🍊",
         "🧺",
         "🕯️"
-
     ];
 
 
@@ -815,7 +716,7 @@ function playPictureGame() {
 
 
     /* -----------------------------------------------------
-       Show objects
+       Display
        ----------------------------------------------------- */
 
     gameArea.innerHTML = `
@@ -831,42 +732,32 @@ function playPictureGame() {
                 MEMORY CHALLENGE
             </p>
 
-
             <h2>
                 Look carefully 👀
             </h2>
-
 
             <p>
                 Remember these objects.
                 Take your time.
             </p>
 
-
             <div
                 class="picture-grid"
                 id="pictureGrid"
             >
 
-                ${
-                    selected
-                        .map(
-                            item => `
+                ${selected.map(item => `
 
-                                <div
-                                    class="picture-item"
-                                    aria-label="Object ${item}"
-                                >
-                                    ${item}
-                                </div>
+                    <div
+                        class="picture-item"
+                        aria-label="Object ${escapeHTML(item)}"
+                    >
+                        ${item}
+                    </div>
 
-                            `
-                        )
-                        .join("")
-                }
+                `).join("")}
 
             </div>
-
 
             <p
                 id="pictureCountdown"
@@ -879,7 +770,6 @@ function playPictureGame() {
             </p>
 
         </div>
-
     `;
 
 
@@ -895,440 +785,43 @@ function playPictureGame() {
         );
 
 
-    const countdownTimer =
-        setInterval(
-            () => {
+    const timer =
+        setInterval(() => {
 
+            secondsLeft--;
 
-                secondsLeft--;
+            if (secondsLeft > 0) {
 
+                countdown.textContent =
+                    `Remember... ${secondsLeft}`;
+            }
 
-                if (
-                    secondsLeft > 0
-                ) {
+        }, 1000);
 
-                    countdown.textContent =
-                        `Remember... ${secondsLeft}`;
 
-                }
+    setTimeout(() => {
 
-            },
-            1000
-        );
+        clearInterval(timer);
 
 
-    /* -----------------------------------------------------
-       Answer screen
-       ----------------------------------------------------- */
-
-    setTimeout(
-        () => {
-
-
-            clearInterval(
-                countdownTimer
-            );
-
-
-            const distractors =
-                randomItems(
-                    objects.filter(
-                        item =>
-                            !selectedSet.has(item)
-                    ),
-                    6
-                );
-
-
-            const choices =
-                randomItems(
-                    [
-                        ...selected,
-                        ...distractors
-                    ],
-                    count + 4
-                );
-
-
-            gameArea.innerHTML = `
-
-                <div
-                    style="
-                        width:100%;
-                        text-align:center;
-                    "
-                >
-
-                    <p class="eyebrow">
-                        MEMORY CHECK
-                    </p>
-
-
-                    <h2>
-                        Which objects did you see?
-                    </h2>
-
-
-                    <p id="selectionCount">
-                        0 selected
-                    </p>
-
-
-                    <div
-                        class="choice-grid"
-                        id="pictureChoices"
-                    >
-
-                        ${
-                            choices
-                                .map(
-                                    item => `
-
-                                        <button
-                                            class="choice-button"
-                                            data-value="${escapeHTML(item)}"
-                                        >
-                                            ${item}
-                                        </button>
-
-                                    `
-                                )
-                                .join("")
-                        }
-
-                    </div>
-
-
-                    <button
-                        id="submitChoices"
-                        class="primary-button"
-                        style="margin-top:20px"
-                    >
-                        Check Answer
-                    </button>
-
-                </div>
-
-            `;
-
-
-            const selectionCount =
-                document.getElementById(
-                    "selectionCount"
-                );
-
-
-            const answerStart =
-                Date.now();
-
-
-            document
-                .querySelectorAll(
-                    ".choice-button"
-                )
-                .forEach(button => {
-
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-
-                            button.classList.toggle(
-                                "selected"
-                            );
-
-
-                            const selectedCount =
-                                document
-                                    .querySelectorAll(
-                                        ".choice-button.selected"
-                                    )
-                                    .length;
-
-
-                            selectionCount.textContent =
-                                `${selectedCount} selected`;
-
-                        }
-                    );
-
-                });
-
-
-            document
-                .getElementById(
-                    "submitChoices"
-                )
-                .addEventListener(
-                    "click",
-                    () => {
-
-
-                        const chosen =
-                            [
-                                ...document
-                                    .querySelectorAll(
-                                        ".choice-button.selected"
-                                    )
-                            ]
-                            .map(
-                                button =>
-                                    button.dataset.value
-                            );
-
-
-                        if (
-                            chosen.length === 0
-                        ) {
-
-                            selectionCount.textContent =
-                                "Please select at least one object.";
-
-                            return;
-
-                        }
-
-
-                        const correct =
-                            chosen.filter(
-                                item =>
-                                    selectedSet.has(item)
-                            ).length;
-
-
-                        const wrong =
-                            chosen.filter(
-                                item =>
-                                    !selectedSet.has(item)
-                            ).length;
-
-
-                        const rawScore =
-                            correct -
-                            wrong * 0.5;
-
-
-                        const accuracy =
-                            Math.max(
-                                0,
-                                Math.min(
-                                    100,
-                                    Math.round(
-                                        (
-                                            rawScore /
-                                            count
-                                        ) * 100
-                                    )
-                                )
-                            );
-
-
-                        let message;
-
-
-                        if (
-                            correct === count &&
-                            wrong === 0
-                        ) {
-
-                            message =
-                                "Amazing! You remembered everything! 🎉";
-
-                        } else if (
-                            accuracy >= 75
-                        ) {
-
-                            message =
-                                `Excellent! You remembered ${correct} of ${count}. 🌟`;
-
-                        } else if (
-                            accuracy >= 50
-                        ) {
-
-                            message =
-                                `Good effort! You remembered ${correct} of ${count}. 🌿`;
-
-                        } else {
-
-                            message =
-                                `Nice try! You remembered ${correct} of ${count}. Keep practicing. 💚`;
-
-                        }
-
-
-                        finishGame(
-
-                            message,
-
-                            accuracy,
-
-                            count,
-
-                            Date.now() - answerStart
-
-                        );
-
-                    }
-                );
-
-
-        },
-        displayTime
-    );
-
-}
-
-
-/* =========================================================
-   GAME 3
-   OBJECT MATCHING
-   ========================================================= */
-
-function playObjectGame() {
-
-
-    const pairs = [
-
-        {
-            item: "☕",
-            matches: ["🍵", "🥄", "🫖"],
-            name: "Tea time"
-        },
-
-        {
-            item: "🪥",
-            matches: ["🦷", "🧴", "🧼"],
-            name: "Getting ready"
-        },
-
-        {
-            item: "🔑",
-            matches: ["🚪", "🏠", "🔒"],
-            name: "Going home"
-        },
-
-        {
-            item: "👟",
-            matches: ["🧦", "👕", "🎒"],
-            name: "Getting dressed"
-        },
-
-        {
-            item: "📖",
-            matches: ["👓", "🪑", "💡"],
-            name: "Reading"
-        },
-
-        {
-            item: "🍽️",
-            matches: ["🥄", "🍴", "🥣"],
-            name: "Mealtime"
-        },
-
-        {
-            item: "🌱",
-            matches: ["🌳", "🪴", "🌷"],
-            name: "Gardening"
-        },
-
-        {
-            item: "🛏️",
-            matches: ["🛌", "🛋️", "🛏️"],
-            name: "Resting"
-
-        }
-
-    ];
-
-
-    const rounds =
-        currentDifficulty === "easy"
-            ? 1
-            : currentDifficulty === "medium"
-                ? 2
-                : 3;
-
-
-    let round = 0;
-
-    let score = 0;
-
-    let roundStartTime;
-
-
-    /* -----------------------------------------------------
-       Start matching round
-       ----------------------------------------------------- */
-
-    function startRound() {
-
-
-        if (
-            round >= rounds
-        ) {
-
-            const accuracy =
-                Math.round(
-                    (score / rounds) * 100
-                );
-
-
-            finishGame(
-
-                `You matched ${score} of ${rounds} correctly! 🔗`,
-
-                accuracy,
-
-                rounds,
-
-                Date.now() - roundStartTime
-
-            );
-
-
-            return;
-
-        }
-
-
-        round++;
-
-
-        const pair =
-            randomItem(pairs);
-
-
-        const correct =
-            randomItem(pair.matches);
-
-
-        const wrongOptions =
+        const distractors =
             randomItems(
-                pairs
-                    .flatMap(
-                        p => p.matches
-                    )
-                    .filter(
-                        item =>
-                            item !== correct
-                    ),
-                3
+                objects.filter(
+                    item =>
+                        !selectedSet.has(item)
+                ),
+                6
             );
 
 
         const choices =
             randomItems(
                 [
-                    correct,
-                    ...wrongOptions
+                    ...selected,
+                    ...distractors
                 ],
-                4
+                count + 4
             );
-
-
-        roundStartTime =
-            Date.now();
 
 
         gameArea.innerHTML = `
@@ -1341,103 +834,265 @@ function playObjectGame() {
             >
 
                 <p class="eyebrow">
-                    MATCHING • ROUND ${round} OF ${rounds}
+                    MEMORY CHECK
                 </p>
 
-
-                <div
-                    class="match-target"
-                    style="
-                        font-size:80px;
-                        margin:20px;
-                    "
-                >
-                    ${pair.item}
-                </div>
-
-
                 <h2>
-                    Which item belongs with it?
+                    Which objects did you see?
                 </h2>
 
+                <p id="selectionCount">
+                    0 selected
+                </p>
 
                 <div
                     class="choice-grid"
+                    id="pictureChoices"
                 >
 
-                    ${
-                        choices
-                            .map(
-                                item => `
+                    ${choices.map(item => `
 
-                                    <button
-                                        class="choice-button"
-                                        data-answer="${escapeHTML(item)}"
-                                    >
-                                        ${item}
-                                    </button>
+                        <button
+                            type="button"
+                            class="choice-button"
+                            data-value="${escapeHTML(item)}"
+                        >
+                            ${item}
+                        </button>
 
-                                `
-                            )
-                            .join("")
-                    }
+                    `).join("")}
 
                 </div>
 
-            </div>
+                <button
+                    id="submitPicture"
+                    class="primary-button"
+                    style="margin-top:20px"
+                >
+                    Check Answer
+                </button>
 
+            </div>
         `;
 
 
-        document
-            .querySelectorAll(
-                ".choice-button"
-            )
-            .forEach(button => {
+        const selectionCount =
+            document.getElementById(
+                "selectionCount"
+            );
 
+
+        document
+            .querySelectorAll(".choice-button")
+            .forEach(button => {
 
                 button.addEventListener(
                     "click",
                     () => {
 
-
-                        const answer =
-                            button.dataset.answer;
-
-
-                        if (
-                            answer === correct
-                        ) {
-
-                            score++;
-
-
-                            gameMessage.textContent =
-                                "Excellent match! 🎉";
-
-                        } else {
-
-                            gameMessage.textContent =
-                                "Good try! Let's keep practicing. 🌿";
-
-                        }
-
-
-                        setTimeout(
-                            startRound,
-                            500
+                        button.classList.toggle(
+                            "selected"
                         );
 
+
+                        const total =
+                            document.querySelectorAll(
+                                ".choice-button.selected"
+                            ).length;
+
+
+                        selectionCount.textContent =
+                            `${total} selected`;
                     }
                 );
 
             });
 
-    }
+
+        document
+            .getElementById("submitPicture")
+            .addEventListener(
+                "click",
+                () => {
+
+                    const answers =
+                        [
+                            ...document.querySelectorAll(
+                                ".choice-button.selected"
+                            )
+                        ].map(
+                            button =>
+                                button.dataset.value
+                        );
 
 
-    startRound();
+                    const correct =
+                        answers.filter(
+                            item =>
+                                selectedSet.has(item)
+                        ).length;
 
+
+                    const wrong =
+                        answers.filter(
+                            item =>
+                                !selectedSet.has(item)
+                        ).length;
+
+
+                    const accuracy =
+                        Math.max(
+                            0,
+                            Math.round(
+                                (
+                                    correct -
+                                    wrong * 0.5
+                                ) /
+                                count *
+                                100
+                            )
+                        );
+
+
+                    finishGame(
+                        `You remembered ${correct} of ${count}. 🌸`,
+                        accuracy,
+                        count,
+                        displayTime
+                    );
+                }
+            );
+
+    }, displayTime);
+}
+
+
+/* =========================================================
+   GAME 3
+   OBJECT MATCHING
+   ========================================================= */
+
+function playObjectGame() {
+
+    const pairs = [
+
+        ["☕", "🍵"],
+
+        ["🪥", "🦷"],
+
+        ["🔑", "🚪"],
+
+        ["🍽️", "🥄"],
+
+        ["👟", "🧦"],
+
+        ["📖", "👓"],
+
+        ["✉️", "📮"],
+
+        ["🛏️", "🛌"]
+
+    ];
+
+
+    const pair =
+        pairs[
+            Math.floor(
+                Math.random() *
+                pairs.length
+            )
+        ];
+
+
+    const choices =
+        randomItems(
+            [
+                pair[1],
+                "🚲",
+                "🌳",
+                "🍎",
+                "🏠",
+                "🌸"
+            ],
+            4
+        );
+
+
+    gameArea.innerHTML = `
+
+        <div
+            style="
+                width:100%;
+                text-align:center;
+            "
+        >
+
+            <p class="eyebrow">
+                FIND THE MATCH
+            </p>
+
+            <div
+                class="match-target"
+                style="
+                    font-size:80px;
+                    margin:20px;
+                "
+            >
+                ${pair[0]}
+            </div>
+
+            <h2>
+                Which item belongs with it?
+            </h2>
+
+            <div class="choice-grid">
+
+                ${choices.map(item => `
+
+                    <button
+                        type="button"
+                        class="choice-button"
+                    >
+                        ${item}
+                    </button>
+
+                `).join("")}
+
+            </div>
+
+        </div>
+    `;
+
+
+    document
+        .querySelectorAll(".choice-button")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const correct =
+                        button.textContent.trim() ===
+                        pair[1];
+
+
+                    finishGame(
+
+                        correct
+                            ? "Excellent match! 🎉"
+                            : "Good try! Let's keep practicing. 🌿",
+
+                        correct ? 100 : 0,
+
+                        1,
+
+                        0
+                    );
+                }
+            );
+
+        });
 }
 
 
@@ -1448,157 +1103,40 @@ function playObjectGame() {
 
 function playRoutineGame() {
 
-
     const routines = [
 
-        {
-            title: "A Peaceful Morning",
+        [
+            "7:00 AM — Wake up",
+            "7:30 AM — Breakfast",
+            "8:00 AM — Take medicine",
+            "9:00 AM — Morning walk"
+        ],
 
-            items: [
-                "7:00 AM — Wake up",
-                "7:30 AM — Breakfast",
-                "8:00 AM — Take medicine",
-                "9:00 AM — Morning walk"
-            ]
+        [
+            "8:00 AM — Breakfast",
+            "10:00 AM — Read a book",
+            "12:30 PM — Lunch",
+            "2:00 PM — Rest"
+        ],
 
-        },
-
-        {
-            title: "A Relaxing Day",
-
-            items: [
-                "8:00 AM — Breakfast",
-                "10:00 AM — Read a book",
-                "12:30 PM — Lunch",
-                "2:00 PM — Rest"
-            ]
-
-        },
-
-        {
-            title: "Morning Garden Time",
-
-            items: [
-                "6:30 AM — Wake up",
-                "7:00 AM — Tea",
-                "8:00 AM — Breakfast",
-                "9:30 AM — Garden walk"
-            ]
-
-        },
-
-        {
-            title: "An Afternoon Routine",
-
-            items: [
-                "9:00 AM — Breakfast",
-                "11:00 AM — Talk with family",
-                "1:00 PM — Lunch",
-                "3:00 PM — Afternoon rest"
-            ]
-
-        },
-
-        {
-            title: "An Evening Routine",
-
-            items: [
-                "5:00 PM — Evening tea",
-                "5:30 PM — Short walk",
-                "7:00 PM — Dinner",
-                "8:30 PM — Read a book"
-            ]
-
-        }
+        [
+            "6:30 AM — Wake up",
+            "7:00 AM — Tea",
+            "8:00 AM — Breakfast",
+            "9:30 AM — Garden walk"
+        ]
 
     ];
 
 
     const routine =
-        randomItem(routines);
+        routines[
+            Math.floor(
+                Math.random() *
+                routines.length
+            )
+        ];
 
-
-    const items =
-        routine.items;
-
-
-    const questionIndex =
-        currentDifficulty === "easy"
-            ? 1
-            : currentDifficulty === "medium"
-                ? 2
-                : 3;
-
-
-    const target =
-        items[questionIndex];
-
-
-    const time =
-        target
-            .split("—")[0]
-            .trim();
-
-
-    const correct =
-        target
-            .split("—")[1]
-            .trim();
-
-
-    /* -----------------------------------------------------
-       Create distractors
-       ----------------------------------------------------- */
-
-    const possibleAnswers = [
-
-        "Have breakfast",
-        "Read a book",
-        "Take medicine",
-        "Go for a walk",
-        "Have tea",
-        "Eat lunch",
-        "Take a rest",
-        "Talk with family",
-        "Go to sleep",
-        "Have dinner",
-        "Wake up",
-        "Work in the garden"
-
-    ];
-
-
-    const distractors =
-        randomItems(
-            possibleAnswers.filter(
-                item =>
-                    item !== correct
-            ),
-            3
-        );
-
-
-    const choices =
-        randomItems(
-            [
-                correct,
-                ...distractors
-            ],
-            4
-        );
-
-
-    const displayTime =
-        currentDifficulty === "easy"
-            ? 7000
-            : currentDifficulty === "medium"
-                ? 5500
-                : 4000;
-
-
-    /* -----------------------------------------------------
-       Show routine
-       ----------------------------------------------------- */
 
     gameArea.innerHTML = `
 
@@ -1613,179 +1151,154 @@ function playRoutineGame() {
                 DAILY ROUTINE
             </p>
 
-
             <h2>
-                ${routine.title}
+                Remember this routine 🕒
             </h2>
 
+            <div
+                class="routine-list"
+                style="
+                    max-width:600px;
+                    margin:20px auto;
+                "
+            >
 
-            <p>
-                Remember this routine carefully.
-            </p>
+                ${routine.map(item => `
 
+                    <div
+                        style="
+                            padding:15px;
+                            margin:8px;
+                            border-radius:14px;
+                            background:#E8F0E9;
+                            font-size:20px;
+                            font-weight:700;
+                        "
+                    >
+                        ${escapeHTML(item)}
+                    </div>
 
-            <div class="routine-list">
-
-                ${
-                    items
-                        .map(
-                            item =>
-                                `<div>${item}</div>`
-                        )
-                        .join("")
-                }
+                `).join("")}
 
             </div>
 
-
-            <p
-                id="routineCountdown"
-                style="
-                    font-weight:bold;
-                    margin-top:20px;
-                "
-            >
-                Remember the routine...
+            <p id="routineCountdown">
+                Remember...
             </p>
 
         </div>
-
     `;
 
 
-    let seconds =
-        Math.ceil(
-            displayTime / 1000
-        );
+    const displayTime =
+        currentDifficulty === "easy"
+            ? 6000
+            : currentDifficulty === "medium"
+                ? 5000
+                : 4000;
 
 
-    const countdown =
-        document.getElementById(
-            "routineCountdown"
-        );
+    setTimeout(() => {
+
+        const targetIndex =
+            Math.min(
+                2,
+                routine.length - 1
+            );
 
 
-    const timer =
-        setInterval(
-            () => {
-
-                seconds--;
-
-
-                if (
-                    seconds > 0
-                ) {
-
-                    countdown.textContent =
-                        `Remember... ${seconds}`;
-
-                }
-
-            },
-            1000
-        );
+        const correct =
+            routine[targetIndex]
+                .split("—")[1]
+                .trim();
 
 
-    setTimeout(
-        () => {
+        const choices =
+            randomItems(
+                [
+                    correct,
+                    "Go to sleep",
+                    "Have dinner",
+                    "Watch television",
+                    "Go shopping"
+                ],
+                4
+            );
 
 
-            clearInterval(timer);
+        gameArea.innerHTML = `
 
+            <div
+                style="
+                    width:100%;
+                    text-align:center;
+                "
+            >
 
-            const answerStart =
-                Date.now();
+                <p class="eyebrow">
+                    MEMORY CHECK
+                </p>
 
+                <h2>
+                    What happened at
+                    ${escapeHTML(
+                        routine[targetIndex]
+                            .split("—")[0]
+                            .trim()
+                    )}?
+                </h2>
 
-            gameArea.innerHTML = `
+                <div class="choice-grid">
 
-                <div
-                    style="
-                        width:100%;
-                        text-align:center;
-                    "
-                >
+                    ${choices.map(item => `
 
-                    <p class="eyebrow">
-                        MEMORY CHECK
-                    </p>
+                        <button
+                            type="button"
+                            class="choice-button"
+                        >
+                            ${escapeHTML(item)}
+                        </button>
 
-
-                    <h2>
-                        What happened at ${time}?
-                    </h2>
-
-
-                    <div class="choice-grid">
-
-                        ${
-                            choices
-                                .map(
-                                    item => `
-
-                                        <button
-                                            class="choice-button"
-                                            data-answer="${escapeHTML(item)}"
-                                        >
-                                            ${item}
-                                        </button>
-
-                                    `
-                                )
-                                .join("")
-                        }
-
-                    </div>
+                    `).join("")}
 
                 </div>
 
-            `;
+            </div>
+        `;
 
 
-            document
-                .querySelectorAll(
-                    ".choice-button"
-                )
-                .forEach(button => {
+        document
+            .querySelectorAll(".choice-button")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const isCorrect =
+                            button.textContent.trim() ===
+                            correct;
 
 
-                    button.addEventListener(
-                        "click",
-                        () => {
+                        finishGame(
 
+                            isCorrect
+                                ? "Great memory! 🌟"
+                                : "Nice try. Keep going! 🌿",
 
-                            const isCorrect =
-                                button.dataset.answer ===
-                                correct;
+                            isCorrect ? 100 : 0,
 
+                            1,
 
-                            finishGame(
+                            displayTime
+                        );
 
-                                isCorrect
-                                    ? "Great memory! 🌟"
-                                    : "Nice try! Keep practicing. 🌿",
+                    }
+                );
 
-                                isCorrect
-                                    ? 100
-                                    : 0,
+            });
 
-                                1,
-
-                                Date.now() -
-                                answerStart
-
-                            );
-
-                        }
-                    );
-
-                });
-
-
-        },
-        displayTime
-    );
-
+    }, displayTime);
 }
 
 
@@ -1795,7 +1308,6 @@ function playRoutineGame() {
    ========================================================= */
 
 function playWordGame() {
-
 
     const words = [
 
@@ -1812,13 +1324,9 @@ function playWordGame() {
         "RIVER",
         "MANGO",
         "TABLE",
-        "MILK",
-        "BIRD",
-        "TREE",
-        "SUN",
         "FAMILY",
-        "PHONE",
-        "WATER"
+        "SUN",
+        "BIRD"
 
     ];
 
@@ -1846,14 +1354,6 @@ function playWordGame() {
         );
 
 
-    const selectedSet =
-        new Set(selected);
-
-
-    /* -----------------------------------------------------
-       Show words
-       ----------------------------------------------------- */
-
     gameArea.innerHTML = `
 
         <div
@@ -1867,342 +1367,196 @@ function playWordGame() {
                 WORD MEMORY
             </p>
 
-
             <h2>
-                Remember these words
+                Remember these words 🧠
             </h2>
-
-
-            <p>
-                Read them slowly and remember as many as you can.
-            </p>
-
 
             <div class="word-grid">
 
-                ${
-                    selected
-                        .map(
-                            word =>
-                                `
-                                <div class="word-item">
-                                    ${word}
-                                </div>
-                                `
-                        )
-                        .join("")
-                }
+                ${selected.map(word => `
+
+                    <div class="word-item">
+                        ${word}
+                    </div>
+
+                `).join("")}
 
             </div>
 
-
-            <p
-                id="wordCountdown"
-                style="
-                    font-weight:bold;
-                    margin-top:20px;
-                "
-            >
-                Remember ${count} words
+            <p>
+                Remember ${count} words...
             </p>
 
         </div>
-
     `;
 
 
-    let seconds =
-        Math.ceil(
-            displayTime / 1000
-        );
+    setTimeout(() => {
+
+        const extraWords =
+            words.filter(
+                word =>
+                    !selected.includes(word)
+            );
 
 
-    const countdown =
-        document.getElementById(
-            "wordCountdown"
-        );
+        const choices =
+            randomItems(
+                [
+                    ...selected,
+                    ...randomItems(
+                        extraWords,
+                        4
+                    )
+                ],
+                count + 4
+            );
 
 
-    const timer =
-        setInterval(
-            () => {
+        gameArea.innerHTML = `
 
+            <div
+                style="
+                    width:100%;
+                    text-align:center;
+                "
+            >
 
-                seconds--;
+                <p class="eyebrow">
+                    MEMORY CHECK
+                </p>
 
+                <h2>
+                    Which words did you remember?
+                </h2>
 
-                if (
-                    seconds > 0
-                ) {
-
-                    countdown.textContent =
-                        `Remember... ${seconds}`;
-
-                }
-
-            },
-            1000
-        );
-
-
-    /* -----------------------------------------------------
-       Answer screen
-       ----------------------------------------------------- */
-
-    setTimeout(
-        () => {
-
-
-            clearInterval(timer);
-
-
-            const distractors =
-                randomItems(
-                    words.filter(
-                        word =>
-                            !selectedSet.has(word)
-                    ),
-                    6
-                );
-
-
-            const choices =
-                randomItems(
-                    [
-                        ...selected,
-                        ...distractors
-                    ],
-                    count + 4
-                );
-
-
-            gameArea.innerHTML = `
+                <p id="wordSelectionCount">
+                    0 selected
+                </p>
 
                 <div
-                    style="
-                        width:100%;
-                        text-align:center;
-                    "
+                    class="choice-grid word-choice-grid"
                 >
 
-                    <p class="eyebrow">
-                        MEMORY CHECK
-                    </p>
+                    ${choices.map(word => `
 
+                        <button
+                            type="button"
+                            class="choice-button"
+                            data-word="${escapeHTML(word)}"
+                        >
+                            ${escapeHTML(word)}
+                        </button>
 
-                    <h2>
-                        Which words do you remember?
-                    </h2>
-
-
-                    <p id="wordSelectionCount">
-                        0 selected
-                    </p>
-
-
-                    <div
-                        class="choice-grid word-choice-grid"
-                    >
-
-                        ${
-                            choices
-                                .map(
-                                    word => `
-
-                                        <button
-                                            class="choice-button"
-                                            data-word="${escapeHTML(word)}"
-                                        >
-                                            ${word}
-                                        </button>
-
-                                    `
-                                )
-                                .join("")
-                        }
-
-                    </div>
-
-
-                    <button
-                        id="submitWords"
-                        class="primary-button"
-                        style="margin-top:20px"
-                    >
-                        Check Answer
-                    </button>
+                    `).join("")}
 
                 </div>
 
-            `;
+                <button
+                    id="submitWords"
+                    class="primary-button"
+                    style="margin-top:20px"
+                >
+                    Check Answer
+                </button>
+
+            </div>
+        `;
 
 
-            const selectionText =
-                document.getElementById(
-                    "wordSelectionCount"
-                );
+        const counter =
+            document.getElementById(
+                "wordSelectionCount"
+            );
 
 
-            const answerStart =
-                Date.now();
+        document
+            .querySelectorAll(".choice-button")
+            .forEach(button => {
 
-
-            document
-                .querySelectorAll(
-                    ".choice-button"
-                )
-                .forEach(button => {
-
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-
-                            button.classList.toggle(
-                                "selected"
-                            );
-
-
-                            const selectedCount =
-                                document
-                                    .querySelectorAll(
-                                        ".choice-button.selected"
-                                    )
-                                    .length;
-
-
-                            selectionText.textContent =
-                                `${selectedCount} selected`;
-
-                        }
-                    );
-
-                });
-
-
-            document
-                .getElementById(
-                    "submitWords"
-                )
-                .addEventListener(
+                button.addEventListener(
                     "click",
                     () => {
 
-
-                        const answers =
-                            [
-                                ...document
-                                    .querySelectorAll(
-                                        ".choice-button.selected"
-                                    )
-                            ]
-                            .map(
-                                button =>
-                                    button.dataset.word
-                            );
-
-
-                        if (
-                            answers.length === 0
-                        ) {
-
-                            selectionText.textContent =
-                                "Please select at least one word.";
-
-                            return;
-
-                        }
-
-
-                        const correct =
-                            answers.filter(
-                                word =>
-                                    selectedSet.has(word)
-                            ).length;
-
-
-                        const wrong =
-                            answers.filter(
-                                word =>
-                                    !selectedSet.has(word)
-                            ).length;
-
-
-                        const rawScore =
-                            correct -
-                            wrong * 0.5;
-
-
-                        const accuracy =
-                            Math.max(
-                                0,
-                                Math.min(
-                                    100,
-                                    Math.round(
-                                        (
-                                            rawScore /
-                                            count
-                                        ) * 100
-                                    )
-                                )
-                            );
-
-
-                        let message;
-
-
-                        if (
-                            correct === count &&
-                            wrong === 0
-                        ) {
-
-                            message =
-                                "Fantastic! You remembered every word! 🎉";
-
-                        } else if (
-                            accuracy >= 75
-                        ) {
-
-                            message =
-                                `Excellent! You remembered ${correct} of ${count} words. 🌟`;
-
-                        } else if (
-                            accuracy >= 50
-                        ) {
-
-                            message =
-                                `Good work! You remembered ${correct} of ${count} words. 🌿`;
-
-                        } else {
-
-                            message =
-                                `Nice try! You remembered ${correct} of ${count}. Keep practicing. 💚`;
-
-                        }
-
-
-                        finishGame(
-
-                            message,
-
-                            accuracy,
-
-                            count,
-
-                            Date.now() -
-                            answerStart
-
+                        button.classList.toggle(
+                            "selected"
                         );
 
+
+                        const total =
+                            document.querySelectorAll(
+                                ".choice-button.selected"
+                            ).length;
+
+
+                        counter.textContent =
+                            `${total} selected`;
                     }
                 );
 
+            });
 
-        },
-        displayTime
-    );
 
+        document
+            .getElementById("submitWords")
+            .addEventListener(
+                "click",
+                () => {
+
+                    const answers =
+                        [
+                            ...document.querySelectorAll(
+                                ".choice-button.selected"
+                            )
+                        ].map(
+                            button =>
+                                button.dataset.word
+                        );
+
+
+                    const correct =
+                        answers.filter(
+                            word =>
+                                selected.includes(word)
+                        ).length;
+
+
+                    const wrong =
+                        answers.filter(
+                            word =>
+                                !selected.includes(word)
+                        ).length;
+
+
+                    const accuracy =
+                        Math.max(
+                            0,
+                            Math.round(
+                                (
+                                    correct -
+                                    wrong * 0.5
+                                ) /
+                                count *
+                                100
+                            )
+                        );
+
+
+                    finishGame(
+
+                        `You remembered ${correct} of ${count} words. 🧠`,
+
+                        accuracy,
+
+                        count,
+
+                        displayTime
+                    );
+
+                }
+            );
+
+    }, displayTime);
 }
 
 
@@ -2217,10 +1571,11 @@ async function finishGame(
     timeTaken
 ) {
 
+    if (gameMessage) {
+        gameMessage.textContent =
+            message;
+    }
 
-    /* -----------------------------------------------------
-       Prevent invalid accuracy
-       ----------------------------------------------------- */
 
     accuracy =
         Math.max(
@@ -2232,30 +1587,19 @@ async function finishGame(
         );
 
 
-    const score =
-        accuracy;
+    const score = accuracy;
 
 
     /* -----------------------------------------------------
-       Show message
-       ----------------------------------------------------- */
-
-    gameMessage.textContent =
-        message;
-
-
-    /* -----------------------------------------------------
-       Save to Flask backend
+       Save to Flask + SQLite
        ----------------------------------------------------- */
 
     try {
-
 
         const response =
             await fetch(
                 "/api/game-result",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -2283,24 +1627,21 @@ async function finishGame(
                             )
 
                     })
-
                 }
             );
 
 
         if (!response.ok) {
-
             console.error(
-                "Game result could not be saved."
+                "Could not save game result."
             );
-
         }
 
-
-    } catch (error) {
+    }
+    catch (error) {
 
         console.error(
-            "Backend connection error:",
+            "Game result error:",
             error
         );
 
@@ -2319,41 +1660,20 @@ async function finishGame(
                 🌟
             </div>
 
-
             <h2>
                 Well done!
             </h2>
 
-
             <p>
-                ${message}
+                ${escapeHTML(message)}
             </p>
 
-
-            <div
-                style="
-                    margin:20px 0;
-                    font-size:20px;
-                "
-            >
-
-                <p>
-                    <strong>
-                        Accuracy
-                    </strong>
-                </p>
-
-                <p
-                    style="
-                        font-size:36px;
-                        font-weight:bold;
-                    "
-                >
+            <p>
+                Accuracy:
+                <strong>
                     ${accuracy}%
-                </p>
-
-            </div>
-
+                </strong>
+            </p>
 
             <button
                 id="playAgain"
@@ -2362,23 +1682,9 @@ async function finishGame(
                 Play Again
             </button>
 
-
-            <button
-                id="backToGames"
-                class="secondary-button"
-                style="margin-top:10px"
-            >
-                Back to Games
-            </button>
-
         </div>
-
     `;
 
-
-    /* -----------------------------------------------------
-       Play again
-       ----------------------------------------------------- */
 
     document
         .getElementById("playAgain")
@@ -2386,30 +1692,4 @@ async function finishGame(
             "click",
             startGame
         );
-
-
-    /* -----------------------------------------------------
-       Back to games
-       ----------------------------------------------------- */
-
-    const backButton =
-        document.getElementById(
-            "backToGames"
-        );
-
-
-    if (backButton) {
-
-        backButton.addEventListener(
-            "click",
-            () => {
-
-                window.location.href =
-                    "/games";
-
-            }
-        );
-
-    }
-
 }

@@ -1,47 +1,227 @@
-{% extends "base.html" %}
-{% block title %}Activities | MindSpace{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<section class="page-header">
-    <p class="eyebrow">GENTLE MOVEMENT</p>
-    <h1>Today's activities 🚶</h1>
-    <p>Choose a gentle activity and take it at your own pace.</p>
-</section>
+<head>
+    <meta charset="UTF-8">
 
-<div id="activityList" class="activity-grid">
-    <div class="loading">Loading activities...</div>
-</div>
-{% endblock %}
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-{% block scripts %}
-<script>
-async function loadActivities() {
-    const response = await fetch("/api/activities");
-    const activities = await response.json();
-    const list = document.getElementById("activityList");
+    <title>Activities | ElderCare MindSpace</title>
 
-    list.innerHTML = activities.map(item => `
-        <article class="activity-card ${item.completed ? "completed" : ""}">
-            <div class="activity-icon">🏃</div>
-            <div>
-                <p class="time">${item.scheduled_time}</p>
-                <h2>${item.activity_name}</h2>
-                <p>${item.duration} minutes</p>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        <span class="brand-icon">🌿</span>
+        ElderCare MindSpace
+    </div>
+
+    <nav class="nav">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('games') }}">
+            Games
+        </a>
+
+        <a href="{{ url_for('reminders') }}">
+            Reminders
+        </a>
+
+        <a href="{{ url_for('progress') }}">
+            Progress
+        </a>
+
+        <a href="{{ url_for('activities') }}"
+           style="
+                background: var(--primary);
+                color: white;
+                border-radius: 12px;
+                padding: 9px 13px;
+           ">
+            Activities
+        </a>
+
+        <a href="{{ url_for('profile') }}">
+            Profile
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="page-container">
+
+    <section class="page-header">
+
+        <p class="eyebrow">
+            DAILY WELLNESS
+        </p>
+
+        <h1>
+            🌱 Daily Activities
+        </h1>
+
+        <p>
+            Simple activities help create a calm,
+            familiar and meaningful daily routine.
+        </p>
+
+    </section>
+
+
+    <section class="two-column">
+
+        <!-- ADD ACTIVITY -->
+
+        <div class="form-card">
+
+            <h2>
+                ➕ Add a Daily Activity
+            </h2>
+
+            <p style="color: var(--muted);">
+                Add something simple to remember and enjoy.
+            </p>
+
+
+            <form id="activityForm">
+
+                <label for="activityName">
+                    Activity
+                </label>
+
+                <input
+                    id="activityName"
+                    type="text"
+                    placeholder="Example: Morning Walk"
+                    required
+                >
+
+
+                <label for="activityDuration">
+                    Duration
+                </label>
+
+                <input
+                    id="activityDuration"
+                    type="text"
+                    placeholder="Example: 15 minutes"
+                >
+
+
+                <label for="activityScheduledTime">
+                    Time
+                </label>
+
+                <input
+                    id="activityScheduledTime"
+                    type="time"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Add Activity
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- INFORMATION -->
+
+        <div class="info-card">
+
+            <div class="card-icon">
+                🌼
             </div>
-            <button class="secondary-button"
-                onclick="completeActivity(${item.id})"
-                ${item.completed ? "disabled" : ""}>
-                ${item.completed ? "✓ Done" : "Mark Done"}
-            </button>
-        </article>
-    `).join("");
-}
 
-async function completeActivity(id) {
-    await fetch(`/api/activities/${id}/complete`, { method: "POST" });
-    loadActivities();
-}
+            <h3>
+                A Gentle Daily Routine
+            </h3>
 
-loadActivities();
-</script>
-{% endblock %}
+            <p>
+                Familiar activities such as walking,
+                reading, gardening or listening to music
+                can make the day more meaningful.
+            </p>
+
+            <p>
+                Keep activities simple and comfortable.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ACTIVITIES -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+                <p class="eyebrow">
+                    TODAY
+                </p>
+
+                <h2>
+                    Your Activities
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div
+            id="activityList"
+            class="activity-grid"
+        >
+            <div class="loading">
+                Loading activities...
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <span>
+        🌿 ElderCare MindSpace
+    </span>
+
+    <span>
+        Supporting healthier minds, one day at a time.
+    </span>
+
+</footer>
+
+
+<script
+    src="{{ url_for('static', filename='js/activities.js') }}"
+></script>
+
+</body>
+</html>

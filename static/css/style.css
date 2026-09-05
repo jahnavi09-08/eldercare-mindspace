@@ -673,3 +673,468 @@ select {
         gap: 6px;
     }
 }
+/* =========================================
+   ELDERCARE MINDSPACE - FINAL UI POLISH
+   ========================================= */
+
+/* Better keyboard accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+
+/* Smoother interactions */
+button,
+a,
+.game-card,
+.quick-card,
+.info-card,
+.reminder-item,
+.activity-card {
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+
+/* Better buttons for elderly users */
+.primary-button,
+.secondary-button {
+    min-height: 54px;
+    padding: 13px 24px;
+    font-size: 18px;
+    border-radius: 14px;
+}
+
+
+/* Make disabled buttons clearly disabled */
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+
+/* Better game cards */
+.game-card:hover,
+.quick-card:hover,
+.info-card:hover {
+    box-shadow: 0 14px 34px rgba(38, 52, 45, 0.12);
+}
+
+
+/* Better reminder / activity cards */
+.reminder-item:hover,
+.activity-card:hover {
+    box-shadow: 0 12px 30px rgba(38, 52, 45, 0.11);
+}
+
+
+/* Clear completed state */
+.reminder-item.completed {
+    background: #f3f7f4;
+}
+
+.reminder-item.completed h3 {
+    text-decoration: line-through;
+}
+
+
+/* Status text */
+.reminder-status {
+    margin-top: 8px;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+
+/* Better form controls */
+.form-card input,
+.form-card textarea,
+.form-card select,
+input,
+textarea,
+select {
+    min-height: 50px;
+    font-size: 18px;
+}
+
+
+/* Prevent textarea from inheriting input height */
+textarea {
+    min-height: 100px;
+}
+
+
+/* Better section spacing */
+.section {
+    scroll-margin-top: 100px;
+}
+
+
+/* Progress page enhancements */
+.progress-section {
+    margin-top: 28px;
+}
+
+.progress-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.progress-stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow);
+}
+
+.progress-stat-icon {
+    font-size: 36px;
+}
+
+.progress-stat-card p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.progress-stat-card strong {
+    display: block;
+    font-size: 30px;
+    margin-top: 3px;
+}
+
+
+/* Game performance */
+.game-performance-list {
+    display: grid;
+    gap: 16px;
+}
+
+.progress-game-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+}
+
+.progress-game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.progress-game-header h3 {
+    margin: 0;
+}
+
+.progress-game-header span {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.progress-bar {
+    height: 14px;
+    background: var(--soft);
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 14px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.progress-game-details {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+
+/* Difficulty cards */
+.difficulty-performance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.difficulty-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.difficulty-card p {
+    margin: 8px 0 0;
+    color: var(--muted);
+}
+
+.difficulty-score {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+
+/* Recommendation card */
+.recommendation-card,
+.trend-card {
+    background: var(--soft);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.recommendation-icon,
+.trend-icon {
+    font-size: 42px;
+    flex-shrink: 0;
+}
+
+.recommendation-card h2,
+.trend-card h2 {
+    margin: 0 0 6px;
+}
+
+.recommendation-card p,
+.trend-card p {
+    margin: 0;
+    color: var(--muted);
+}
+
+
+/* Recent results */
+.recent-results {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+
+/* Better mobile progress layout */
+@media (max-width: 900px) {
+
+    .progress-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .difficulty-performance-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* Mobile senior-friendly layout */
+@media (max-width: 600px) {
+
+    .topbar {
+        padding: 12px 4%;
+    }
+
+    .brand {
+        font-size: 20px;
+    }
+
+    .brand-icon {
+        font-size: 26px;
+    }
+
+    .page-container {
+        width: 92%;
+    }
+
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+        min-height: 56px;
+    }
+
+    .reminder-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reminder-item > div:last-child {
+        width: 100%;
+    }
+
+    .reminder-time {
+        margin-bottom: 10px;
+    }
+
+    .progress-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .progress-stat-card {
+        padding: 20px;
+    }
+
+    .progress-game-details {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .recommendation-card,
+    .trend-card {
+        align-items: flex-start;
+    }
+
+}
+/* =========================================================
+   PROFILE PAGE HEADER / NAVIGATION FIX
+   ========================================================= */
+
+.site-header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.logo {
+    color: var(--primary-dark);
+    font-size: 1.45rem;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.main-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 46px;
+    padding: 10px 16px;
+
+    border-radius: 12px;
+    border: 1px solid transparent;
+
+    color: var(--text);
+    background: transparent;
+
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.main-nav a:hover {
+    background: var(--soft);
+    color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.main-nav a.active {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(77, 118, 93, 0.22);
+}
+
+.main-nav a.active:hover {
+    background: var(--primary-dark);
+    color: #ffffff;
+}
+
+
+/* Profile page container compatibility */
+.container {
+    width: min(1200px, calc(100% - 40px));
+    margin: 0 auto;
+}
+
+
+/* Mobile / smaller screens */
+@media (max-width: 900px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 20px;
+    }
+
+    .logo {
+        text-align: center;
+    }
+
+    .main-nav {
+        justify-content: center;
+    }
+
+    .main-nav a {
+        min-height: 44px;
+        padding: 9px 13px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .header-inner {
+        padding: 12px 14px;
+    }
+
+    .main-nav {
+        gap: 6px;
+    }
+
+    .main-nav a {
+        padding: 8px 11px;
+        font-size: 15px;
+    }
+
+    .container {
+        width: min(100% - 24px, 1200px);
+    }
+}
