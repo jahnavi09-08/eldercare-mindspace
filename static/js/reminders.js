@@ -1,595 +1,284 @@
-// ============================================================
-// Eldercare MindSpace - Reminders
-// Reminder list + completion + browser notification + beep alarm
-// ============================================================
-
-let activeReminders = [];
-let reminderCheckTimer = null;
-let alarmInterval = null;
-let audioContext = null;
+/* =========================================================
+   MINDSPACE - REMINDERS
+   ========================================================= */
 
 
-// ============================================================
-// INITIALIZE ALERT SYSTEM
-// ============================================================
+/* =========================================================
+   ESCAPE HTML
+   Prevents text from breaking the page layout
+   ========================================================= */
 
-async function enableReminderAlerts() {
-    // Ask for browser notification permission
-    if ("Notification" in window) {
-        try {
-            if (Notification.permission === "default") {
-                await Notification.requestPermission();
-            }
-        } catch (error) {
-            console.log("Notification permission error:", error);
-        }
-    }
+function escapeHTML(text) {
 
-    // Prepare audio after user interaction
-    try {
-        if (!audioContext) {
-            const AudioContext =
-                window.AudioContext || window.webkitAudioContext;
-
-            if (AudioContext) {
-                audioContext = new AudioContext();
-            }
-        }
-
-        if (audioContext && audioContext.state === "suspended") {
-            await audioContext.resume();
-        }
-    } catch (error) {
-        console.log("Audio initialization error:", error);
-    }
-}
-
-
-// ============================================================
-// PLAY BEEP
-// ============================================================
-
-function playReminderBeep() {
-    try {
-        const AudioContext =
-            window.AudioContext || window.webkitAudioContext;
-
-        if (!AudioContext) {
-            console.log("Web Audio API is not supported.");
-            return;
-        }
-
-        if (!audioContext) {
-            audioContext = new AudioContext();
-        }
-
-        if (audioContext.state === "suspended") {
-            audioContext.resume();
-        }
-
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(
-            880,
-            audioContext.currentTime
-        );
-
-        gainNode.gain.setValueAtTime(
-            0.001,
-            audioContext.currentTime
-        );
-
-        gainNode.gain.exponentialRampToValueAtTime(
-            0.25,
-            audioContext.currentTime + 0.03
-        );
-
-        gainNode.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 0.5
-        );
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.start();
-
-        oscillator.stop(
-            audioContext.currentTime + 0.5
-        );
-
-    } catch (error) {
-        console.log("Could not play reminder beep:", error);
-    }
-}
-
-
-// ============================================================
-// SHOW BROWSER NOTIFICATION
-// ============================================================
-
-function showReminderNotification(reminder) {
-    if (
-        "Notification" in window &&
-        Notification.permission === "granted"
-    ) {
-        try {
-            new Notification(
-                "⏰ Reminder",
-                {
-                    body:
-                        reminder.title +
-                        (
-                            reminder.description
-                                ? "\n" + reminder.description
-                                : ""
-                        )
-                }
-            );
-        } catch (error) {
-            console.log(
-                "Browser notification could not be shown:",
-                error
-            );
-        }
-    }
-
-    // Always show an in-page alert as well
-    showReminderPopup(reminder);
-}
-
-
-// ============================================================
-// IN-PAGE REMINDER POPUP
-// ============================================================
-
-function showReminderPopup(reminder) {
-
-    // Remove existing popup
-    const oldPopup = document.getElementById(
-        "reminderAlertPopup"
-    );
-
-    if (oldPopup) {
-        oldPopup.remove();
-    }
-
-    const backdrop = document.createElement("div");
-
-    backdrop.id = "reminderAlertPopup";
-    backdrop.className = "reminder-alert-backdrop";
-
-    backdrop.innerHTML = `
-        <div class="reminder-alert-card">
-
-            <div class="reminder-alert-icon">
-                ⏰
-            </div>
-
-            <h2>
-                Reminder
-            </h2>
-
-            <h3>
-                ${escapeHtml(reminder.title || "Reminder")}
-            </h3>
-
-            ${
-                reminder.description
-                    ? `
-                        <p>
-                            ${escapeHtml(reminder.description)}
-                        </p>
-                    `
-                    : ""
-            }
-
-            ${
-                reminder.reminder_time
-                    ? `
-                        <div class="reminder-alert-time">
-                            🕐 ${escapeHtml(reminder.reminder_time)}
-                        </div>
-                    `
-                    : ""
-            }
-
-            <button
-                type="button"
-                class="btn btn-primary reminder-stop-button"
-                onclick="stopReminderAlarm()"
-            >
-                ✓ Got it — Stop Alarm
-            </button>
-
-        </div>
-    `;
-
-    document.body.appendChild(backdrop);
-}
-
-
-// ============================================================
-// STOP ALARM
-// ============================================================
-
-function stopReminderAlarm() {
-
-    if (alarmInterval) {
-        clearInterval(alarmInterval);
-        alarmInterval = null;
-    }
-
-    const popup = document.getElementById(
-        "reminderAlertPopup"
-    );
-
-    if (popup) {
-        popup.remove();
-    }
-}
-
-
-// ============================================================
-// ESCAPE HTML
-// Prevent HTML injection in reminder text
-// ============================================================
-
-function escapeHtml(value) {
-
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
+    return String(text || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
 
 
-// ============================================================
-// CHECK REMINDERS
-// Runs every 10 seconds
-// ============================================================
+/* =========================================================
+   GET ICON FOR REMINDER TYPE
+   ========================================================= */
 
-function checkDueReminders() {
+function getReminderIcon(type) {
 
-    const now = new Date();
+    const icons = {
 
-    const hours = String(
-        now.getHours()
-    ).padStart(2, "0");
+        Health: "💊",
+        Activity: "🚶",
+        Wellness: "🌿",
+        Brain: "🧠"
 
-    const minutes = String(
-        now.getMinutes()
-    ).padStart(2, "0");
+    };
 
-    const currentTime =
-        `${hours}:${minutes}`;
+    return icons[type] || "🔔";
 
-    const today =
-        `${now.getFullYear()}-${String(
-            now.getMonth() + 1
-        ).padStart(2, "0")}-${String(
-            now.getDate()
-        ).padStart(2, "0")}`;
-
-    activeReminders.forEach(reminder => {
-
-        // Ignore completed reminders
-        if (
-            reminder.completed === true ||
-            reminder.completed === 1 ||
-            reminder.completed === "1"
-        ) {
-            return;
-        }
-
-        // Get reminder time
-        const reminderTime =
-            reminder.reminder_time ||
-            reminder.time;
-
-        if (!reminderTime) {
-            return;
-        }
-
-        // Only trigger when the time matches
-        if (reminderTime.substring(0, 5) !== currentTime) {
-            return;
-        }
-
-        // Prevent the same reminder from firing repeatedly
-        // on the same day.
-        const firedKey =
-            `reminder-fired-${reminder.id}-${today}`;
-
-        if (localStorage.getItem(firedKey)) {
-            return;
-        }
-
-        // Mark as fired
-        localStorage.setItem(
-            firedKey,
-            "true"
-        );
-
-        // Show notification
-        showReminderNotification(reminder);
-
-        // Play first beep
-        playReminderBeep();
-
-        // Keep beeping every 1.5 seconds
-        // until the user stops the alarm.
-        if (!alarmInterval) {
-
-            alarmInterval = setInterval(
-                () => {
-
-                    const popup =
-                        document.getElementById(
-                            "reminderAlertPopup"
-                        );
-
-                    if (!popup) {
-                        clearInterval(
-                            alarmInterval
-                        );
-
-                        alarmInterval = null;
-
-                        return;
-                    }
-
-                    playReminderBeep();
-
-                },
-                1500
-            );
-        }
-
-    });
 }
 
 
-// ============================================================
-// LOAD REMINDERS
-// ============================================================
+/* =========================================================
+   LOAD REMINDERS
+   ========================================================= */
 
 async function loadReminders() {
 
-    const reminderList =
-        document.getElementById(
-            "reminderList"
-        );
+    const list =
+        document.getElementById("reminderList");
 
-    if (!reminderList) {
+
+    if (!list) {
         return;
     }
+
 
     try {
 
         const response =
             await fetch("/api/reminders");
 
+
         if (!response.ok) {
+
             throw new Error(
                 "Could not load reminders"
             );
+
         }
+
 
         const reminders =
             await response.json();
 
-        activeReminders = reminders;
 
-        // Empty state
-        if (!reminders.length) {
+        /* -------------------------------------------------
+           EMPTY STATE
+           ------------------------------------------------- */
 
-            reminderList.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        ⏰
+        if (!reminders || reminders.length === 0) {
+
+            list.innerHTML = `
+
+                <div class="empty-reminders">
+
+                    <div style="font-size: 40px; margin-bottom: 10px;">
+                        🔔
                     </div>
 
-                    <h3>
+                    <strong>
                         No reminders yet
-                    </h3>
+                    </strong>
 
-                    <p>
-                        Add a reminder below
-                        to help keep track of
-                        important activities.
+                    <p style="margin-top: 8px;">
+                        Add a reminder below to help
+                        remember important things.
                     </p>
+
                 </div>
+
             `;
 
             return;
+
         }
 
-        reminderList.innerHTML =
-            reminders.map(reminder => {
+
+        /* -------------------------------------------------
+           DISPLAY REMINDERS
+           ------------------------------------------------- */
+
+        list.innerHTML =
+            reminders.map(item => {
+
 
                 const completed =
-                    reminder.completed === true ||
-                    reminder.completed === 1 ||
-                    reminder.completed === "1";
+                    Boolean(item.completed);
 
-                const reminderTime =
-                    reminder.reminder_time ||
-                    reminder.time ||
-                    "";
+
+                const icon =
+                    getReminderIcon(item.type);
+
 
                 return `
-                    <div
-                        class="
-                            reminder-card
-                            ${completed ? "completed" : ""}
-                        "
+
+                    <article
+                        class="reminder-card"
                     >
+
+                        <!-- REMINDER INFORMATION -->
 
                         <div class="reminder-info">
 
-                            <div class="reminder-icon">
+                            <h3>
+                                ${icon}
+                                ${escapeHTML(item.title)}
+                            </h3>
+
+
+                            ${
+
+                                item.description
+
+                                    ? `
+
+                                        <p>
+                                            ${escapeHTML(
+                                                item.description
+                                            )}
+                                        </p>
+
+                                    `
+
+                                    : ""
+
+                            }
+
+
+                            <p
+                                class="reminder-time"
+                            >
+
+                                ⏰
+                                ${escapeHTML(
+                                    item.reminder_time
+                                )}
+
+                            </p>
+
+
+                            <p>
+
                                 ${
-                                    getReminderIcon(
-                                        reminder.type
-                                    )
-                                }
-                            </div>
+                                    completed
 
-                            <div>
+                                        ? "✅ Completed"
 
-                                <h3>
-                                    ${escapeHtml(
-                                        reminder.title ||
-                                        "Reminder"
-                                    )}
-                                </h3>
-
-                                <div class="reminder-time">
-                                    🕐
-                                    ${
-                                        escapeHtml(
-                                            reminderTime
-                                        )
-                                    }
-                                </div>
-
-                                ${
-                                    reminder.description
-                                        ? `
-                                            <p>
-                                                ${escapeHtml(
-                                                    reminder.description
-                                                )}
-                                            </p>
-                                        `
-                                        : ""
-                                }
-
-                                ${
-                                    reminder.type
-                                        ? `
-                                            <span
-                                                class="
-                                                    reminder-type
-                                                "
-                                            >
-                                                ${escapeHtml(
-                                                    reminder.type
-                                                )}
-                                            </span>
-                                        `
-                                        : ""
+                                        : `🔔 ${
+                                            escapeHTML(
+                                                item.type ||
+                                                "Reminder"
+                                            )
+                                        }`
                                 }
 
-                            </div>
+                            </p>
 
                         </div>
 
-                        <div class="reminder-actions">
+
+                        <!-- MARK DONE BUTTON -->
+
+                        <button
+                            type="button"
+
+                            class="
+                                complete-btn
+                                ${
+                                    completed
+                                        ? "completed"
+                                        : ""
+                                }
+                            "
+
+                            onclick="
+                                completeReminder(
+                                    ${item.id}
+                                )
+                            "
 
                             ${
                                 completed
-                                    ? `
-                                        <span
-                                            class="
-                                                reminder-status
-                                                completed-status
-                                            "
-                                        >
-                                            ✓ Done
-                                        </span>
-                                    `
-                                    : `
-                                        <button
-                                            type="button"
-                                            class="
-                                                btn
-                                                btn-secondary
-                                                reminder-complete-btn
-                                            "
-                                            onclick="
-                                                completeReminder(
-                                                    ${reminder.id}
-                                                )
-                                            "
-                                        >
-                                            ✓ Mark Done
-                                        </button>
-                                    `
+                                    ? "disabled"
+                                    : ""
+                            }
+                        >
+
+                            ${
+                                completed
+
+                                    ? "✓ Completed"
+
+                                    : "✓ Mark Done"
                             }
 
-                        </div>
+                        </button>
 
-                    </div>
+
+                    </article>
+
                 `;
 
             }).join("");
 
-    } catch (error) {
+
+    }
+    catch (error) {
 
         console.error(
-            "Error loading reminders:",
+            "Reminder loading error:",
             error
         );
 
-        reminderList.innerHTML = `
-            <div class="error-state">
-                <h3>
-                    Unable to load reminders
-                </h3>
 
-                <p>
+        list.innerHTML = `
+
+            <div class="empty-reminders">
+
+                <div
+                    style="
+                        font-size:40px;
+                        margin-bottom:10px;
+                    "
+                >
+                    ⚠️
+                </div>
+
+                <strong>
+                    Unable to load reminders
+                </strong>
+
+                <p style="margin-top:8px;">
+
                     Please refresh the page
                     and try again.
+
                 </p>
+
             </div>
+
         `;
+
     }
+
 }
 
 
-// ============================================================
-// REMINDER ICON
-// ============================================================
-
-function getReminderIcon(type) {
-
-    const reminderType =
-        String(type || "")
-            .toLowerCase();
-
-    if (reminderType === "health") {
-        return "💊";
-    }
-
-    if (reminderType === "activity") {
-        return "🚶";
-    }
-
-    if (reminderType === "wellness") {
-        return "🧘";
-    }
-
-    if (reminderType === "brain") {
-        return "🧠";
-    }
-
-    return "⏰";
-}
-
-
-// ============================================================
-// COMPLETE REMINDER
-// ============================================================
+/* =========================================================
+   MARK REMINDER AS COMPLETED
+   ========================================================= */
 
 async function completeReminder(id) {
 
@@ -597,309 +286,340 @@ async function completeReminder(id) {
 
         const response =
             await fetch(
+
                 `/api/reminders/${id}/complete`,
+
                 {
                     method: "POST"
                 }
+
             );
 
+
         if (!response.ok) {
+
             throw new Error(
                 "Could not complete reminder"
             );
+
         }
 
-        // Stop alarm if this reminder is currently alerting
-        stopReminderAlarm();
 
-        // Reload reminders
+        /* Reload the reminder list */
+
         await loadReminders();
 
-    } catch (error) {
+
+    }
+    catch (error) {
 
         console.error(
-            "Error completing reminder:",
+            "Complete reminder error:",
             error
         );
 
+
         alert(
-            "Unable to mark the reminder as complete. Please try again."
+            "We couldn't update this reminder. Please try again."
         );
+
     }
+
 }
 
 
-// ============================================================
-// ADD NEW REMINDER
-// ============================================================
+/* =========================================================
+   ADD NEW REMINDER
+   ========================================================= */
 
-async function handleReminderSubmit(event) {
+const reminderForm =
+    document.getElementById("reminderForm");
 
-    event.preventDefault();
 
-    // Enable notification/audio after user interaction
-    await enableReminderAlerts();
+if (reminderForm) {
 
-    const titleInput =
-        document.getElementById(
-            "reminderTitle"
-        );
+    reminderForm.addEventListener(
 
-    const timeInput =
-        document.getElementById(
-            "reminderTime"
-        );
+        "submit",
 
-    const typeInput =
-        document.getElementById(
-            "reminderType"
-        );
+        async event => {
 
-    const descriptionInput =
-        document.getElementById(
-            "reminderDescription"
-        );
+            event.preventDefault();
 
-    if (!titleInput || !timeInput) {
-        return;
-    }
 
-    const title =
-        titleInput.value.trim();
+            /* ---------------------------------------------
+               GET FORM VALUES
+               --------------------------------------------- */
 
-    const reminderTime =
-        timeInput.value;
+            const title =
+                document
+                    .getElementById("reminderTitle")
+                    .value
+                    .trim();
 
-    const type =
-        typeInput
-            ? typeInput.value
-            : "";
 
-    const description =
-        descriptionInput
-            ? descriptionInput.value.trim()
-            : "";
+            const reminderTime =
+                document
+                    .getElementById("reminderTime")
+                    .value;
 
-    // Validate
-    if (!title) {
 
-        alert(
-            "Please enter a reminder title."
-        );
+            const type =
+                document
+                    .getElementById("reminderType")
+                    .value;
 
-        titleInput.focus();
 
-        return;
-    }
+            const description =
+                document
+                    .getElementById("reminderDescription")
+                    .value
+                    .trim();
 
-    if (!reminderTime) {
 
-        alert(
-            "Please select a reminder time."
-        );
+            /* ---------------------------------------------
+               VALIDATION
+               --------------------------------------------- */
 
-        timeInput.focus();
+            if (!title) {
 
-        return;
-    }
+                alert(
+                    "Please enter a reminder title."
+                );
 
-    try {
+                return;
 
-        const response =
-            await fetch(
-                "/api/reminders",
-                {
-                    method: "POST",
+            }
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
 
-                    body: JSON.stringify({
-                        title: title,
-                        reminder_time:
-                            reminderTime,
-                        type: type,
-                        description:
-                            description
-                    })
+            if (!reminderTime) {
+
+                alert(
+                    "Please choose a reminder time."
+                );
+
+                return;
+
+            }
+
+
+            /* ---------------------------------------------
+               PREPARE DATA
+               --------------------------------------------- */
+
+            const payload = {
+
+                title: title,
+
+                reminder_time: reminderTime,
+
+                type: type,
+
+                description: description
+
+            };
+
+
+            try {
+
+                const submitButton =
+                    reminderForm.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                /* -----------------------------------------
+                   DISABLE BUTTON WHILE SAVING
+                   ----------------------------------------- */
+
+                if (submitButton) {
+
+                    submitButton.disabled = true;
+
+                    submitButton.textContent =
+                        "Adding...";
+
                 }
-            );
 
-        if (!response.ok) {
 
-            const errorText =
-                await response.text();
+                /* -----------------------------------------
+                   SEND TO FLASK
+                   ----------------------------------------- */
 
-            console.error(
-                "Server error:",
-                errorText
-            );
+                const response =
+                    await fetch(
 
-            throw new Error(
-                "Could not save reminder"
-            );
+                        "/api/reminders",
+
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    payload
+                                )
+
+                        }
+
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not create reminder"
+                    );
+
+                }
+
+
+                /* -----------------------------------------
+                   CLEAR FORM
+                   ----------------------------------------- */
+
+                reminderForm.reset();
+
+
+                /* -----------------------------------------
+                   RELOAD REMINDERS
+                   ----------------------------------------- */
+
+                await loadReminders();
+
+
+                /* -----------------------------------------
+                   SUCCESS MESSAGE
+                   ----------------------------------------- */
+
+                showReminderSuccess();
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Add reminder error:",
+                    error
+                );
+
+
+                alert(
+                    "We couldn't add the reminder. Please try again."
+                );
+
+            }
+            finally {
+
+                const submitButton =
+                    reminderForm.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled = false;
+
+                    submitButton.innerHTML =
+                        "✓&nbsp; Add Reminder";
+
+                }
+
+            }
+
         }
 
-        // Clear form
-        titleInput.value = "";
+    );
 
-        timeInput.value = "";
-
-        if (typeInput) {
-            typeInput.value = "Health";
-        }
-
-        if (descriptionInput) {
-            descriptionInput.value = "";
-        }
-
-        // Reload list
-        await loadReminders();
-
-        // Make sure monitoring is running
-        startReminderMonitoring();
-
-        // Friendly confirmation
-        showTemporaryMessage(
-            "✓ Reminder added successfully!"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Error adding reminder:",
-            error
-        );
-
-        alert(
-            "Unable to add the reminder. Please try again."
-        );
-    }
 }
 
 
-// ============================================================
-// TEMPORARY SUCCESS MESSAGE
-// ============================================================
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
 
-function showTemporaryMessage(message) {
+function showReminderSuccess() {
 
-    const existing =
-        document.getElementById(
-            "reminderSuccessMessage"
+    /* Remove old success message */
+
+    const oldMessage =
+        document.querySelector(
+            ".reminder-success"
         );
 
-    if (existing) {
-        existing.remove();
+
+    if (oldMessage) {
+
+        oldMessage.remove();
+
     }
 
-    const messageBox =
+
+    const successMessage =
         document.createElement("div");
 
-    messageBox.id =
-        "reminderSuccessMessage";
 
-    messageBox.className =
-        "reminder-success-message";
+    successMessage.className =
+        "reminder-success";
 
-    messageBox.textContent =
-        message;
 
-    document.body.appendChild(
-        messageBox
-    );
+    successMessage.innerHTML = `
+
+        ✓ Reminder added successfully!
+
+    `;
+
+
+    const form =
+        document.getElementById(
+            "reminderForm"
+        );
+
+
+    if (form) {
+
+        form.insertAdjacentElement(
+
+            "afterend",
+
+            successMessage
+
+        );
+
+    }
+
+
+    /* Automatically remove message */
 
     setTimeout(() => {
 
-        messageBox.remove();
+        successMessage.remove();
 
     }, 3000);
+
 }
 
 
-// ============================================================
-// START REMINDER MONITORING
-// ============================================================
-
-function startReminderMonitoring() {
-
-    // Avoid multiple timers
-    if (reminderCheckTimer) {
-        clearInterval(
-            reminderCheckTimer
-        );
-    }
-
-    // Check immediately
-    checkDueReminders();
-
-    // Then check every 10 seconds
-    reminderCheckTimer =
-        setInterval(
-            checkDueReminders,
-            10000
-        );
-}
-
-
-// ============================================================
-// PAGE INITIALIZATION
-// ============================================================
+/* =========================================================
+   LOAD REMINDERS WHEN PAGE OPENS
+   ========================================================= */
 
 document.addEventListener(
+
     "DOMContentLoaded",
-    async () => {
 
-        // Load reminders
-        await loadReminders();
-
-        // Start reminder checker
-        startReminderMonitoring();
-
-        // Connect form
-        const form =
-            document.getElementById(
-                "reminderForm"
-            );
-
-        if (form) {
-
-            form.addEventListener(
-                "submit",
-                handleReminderSubmit
-            );
-        }
-
-    }
-);
-
-
-// ============================================================
-// CLEANUP
-// ============================================================
-
-window.addEventListener(
-    "beforeunload",
     () => {
 
-        if (reminderCheckTimer) {
+        loadReminders();
 
-            clearInterval(
-                reminderCheckTimer
-            );
-
-            reminderCheckTimer = null;
-        }
-
-        if (alarmInterval) {
-
-            clearInterval(
-                alarmInterval
-            );
-
-            alarmInterval = null;
-        }
     }
+
 );

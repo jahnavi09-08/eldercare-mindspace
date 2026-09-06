@@ -1,47 +1,195 @@
 {% extends "base.html" %}
+
 {% block title %}Progress | MindSpace{% endblock %}
 
 {% block content %}
+
 <section class="page-header">
     <p class="eyebrow">YOUR JOURNEY</p>
+
     <h1>Your progress 📊</h1>
+
     <p>Every little step counts.</p>
 </section>
 
+
+<!-- ============================= -->
+<!-- PROGRESS STATISTICS -->
+<!-- ============================= -->
+
 <div class="stats-grid">
+
     <article class="stat-card">
+
         <span>🧠</span>
+
         <strong id="gamesPlayed">0</strong>
+
         <p>Games Played</p>
+
     </article>
 
+
     <article class="stat-card">
+
         <span>🎯</span>
+
         <strong id="averageAccuracy">0%</strong>
+
         <p>Average Accuracy</p>
+
     </article>
 
+
     <article class="stat-card">
+
         <span>🌱</span>
+
         <strong>Keep Going</strong>
+
         <p>Consistency matters</p>
+
     </article>
+
 </div>
 
+
+<!-- ============================= -->
+<!-- AI ADAPTIVE GAMING CARD -->
+<!-- ============================= -->
+
 <section class="section">
-    <div class="section-heading">
-        <div>
-            <p class="eyebrow">RECENT SESSIONS</p>
-            <h2>Game history</h2>
+
+    <div class="ai-card">
+
+        <div class="ai-header">
+
+            <div class="ai-icon">
+                🤖
+            </div>
+
+            <div>
+
+                <p class="eyebrow">
+                    AI-INSPIRED ADAPTIVE GAMING
+                </p>
+
+                <h2>
+                    Your Personalized Recommendation
+                </h2>
+
+            </div>
+
         </div>
+
+
+        <div class="ai-recommendation">
+
+            <p class="ai-label">
+                Recommended Difficulty
+            </p>
+
+            <div
+                id="aiDifficulty"
+                class="ai-difficulty"
+            >
+                Loading...
+            </div>
+
+        </div>
+
+
+        <p
+            id="aiMessage"
+            class="ai-message"
+        >
+            MindSpace is analyzing your game performance...
+        </p>
+
+
+        <div class="ai-analysis">
+
+            <p>
+                📊 <strong>Accuracy</strong>
+                <span id="aiAccuracy">
+                    --
+                </span>
+            </p>
+
+
+            <p>
+                🏆 <strong>Average Score</strong>
+                <span id="aiScore">
+                    --
+                </span>
+            </p>
+
+
+            <p>
+                ⏱️ <strong>Completion Time</strong>
+                <span id="aiTime">
+                    --
+                </span>
+            </p>
+
+        </div>
+
+
+        <p class="ai-footer">
+
+            🤖 MindSpace analyzes your performance to
+            personalize your next gaming challenge.
+
+        </p>
+
     </div>
 
-    <div id="progressList" class="stack-list">
-        <div class="loading">Loading progress...</div>
-    </div>
 </section>
+
+
+<!-- ============================= -->
+<!-- RECENT GAME HISTORY -->
+<!-- ============================= -->
+
+<section class="section">
+
+    <div class="section-heading">
+
+        <div>
+
+            <p class="eyebrow">
+                RECENT SESSIONS
+            </p>
+
+            <h2>
+                Game history
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="progressList"
+        class="stack-list"
+    >
+
+        <div class="loading">
+
+            Loading progress...
+
+        </div>
+
+    </div>
+
+</section>
+
 {% endblock %}
 
+
 {% block scripts %}
+
 <script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+
 {% endblock %}

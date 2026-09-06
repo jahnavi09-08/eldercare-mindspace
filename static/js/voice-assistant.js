@@ -1,48 +1,24 @@
 // ============================================
-// ELDERCARE MINDSPACE - VOICE ASSISTANT
+// MINDSPACE - AI VOICE ASSISTANT
 // ============================================
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
+
+    console.log("Voice Assistant loading...");
+
+
+    // ============================================
+    // BROWSER SUPPORT
+    // ============================================
 
     const SpeechRecognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
-    // --------------------------------------------
-    // Browser support
-    // --------------------------------------------
 
-    if (!SpeechRecognition) {
-        console.error("Speech recognition is not supported.");
-
-        alert(
-            "Voice recognition is not supported in this browser. Please use Google Chrome."
-        );
-
-        return;
-    }
-
-    // --------------------------------------------
-    // Recognition
-    // --------------------------------------------
-
-    const recognition = new SpeechRecognition();
-
-    recognition.lang = "en-IN";
-
-    recognition.continuous = false;
-
-    recognition.interimResults = false;
-
-    recognition.maxAlternatives = 1;
-
-
-    let isListening = false;
-
-
-    // --------------------------------------------
-    // Create assistant UI
-    // --------------------------------------------
+    // ============================================
+    // CREATE VOICE ASSISTANT UI
+    // ============================================
 
     const assistant = document.createElement("div");
 
@@ -76,101 +52,318 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("voiceAssistantStatus");
 
 
-    // --------------------------------------------
-    // Speak
-    // --------------------------------------------
+    // ============================================
+    // TEXT TO SPEECH
+    // ============================================
 
     function speak(text) {
 
-        console.log("Assistant:", text);
+        console.log("Assistant says:", text);
 
         if (!("speechSynthesis" in window)) {
+
+            console.error(
+                "Speech synthesis is not supported."
+            );
+
             return;
         }
 
+
+        // Stop previous speech
         window.speechSynthesis.cancel();
+
 
         const utterance =
             new SpeechSynthesisUtterance(text);
 
+
         utterance.lang = "en-IN";
 
-        utterance.rate = 0.85;
+        utterance.rate = 0.9;
 
         utterance.pitch = 1;
 
-        window.speechSynthesis.speak(utterance);
+
+        utterance.onstart = () => {
+
+            console.log(
+                "Assistant started speaking."
+            );
+
+        };
+
+
+        utterance.onend = () => {
+
+            console.log(
+                "Assistant finished speaking."
+            );
+
+        };
+
+
+        utterance.onerror = event => {
+
+            console.error(
+                "Speech synthesis error:",
+                event
+            );
+
+        };
+
+
+        // Important Chrome fix
+        window.speechSynthesis.resume();
+
+
+        setTimeout(() => {
+
+            window.speechSynthesis.speak(
+                utterance
+            );
+
+        }, 100);
+
     }
 
 
-    // --------------------------------------------
-    // START LISTENING
-    // --------------------------------------------
+    // ============================================
+    // CHECK SPEECH RECOGNITION
+    // ============================================
 
-    voiceButton.addEventListener("click", function () {
+    if (!SpeechRecognition) {
 
-        if (isListening) {
-            console.log("Already listening.");
-            return;
-        }
-
-        console.log("Starting microphone...");
+        console.error(
+            "Speech Recognition is not supported."
+        );
 
         status.textContent =
-            "🎧 Starting microphone...";
+            "Voice recognition is not supported in this browser.";
 
-        voiceButton.classList.add("listening");
+        voiceButton.addEventListener(
+            "click",
+            () => {
 
-        isListening = true;
+                speak(
+                    "Voice recognition is not supported. Please use Google Chrome."
+                );
+
+            }
+        );
+
+        return;
+    }
+
+
+    // ============================================
+    // CREATE RECOGNITION
+    // ============================================
+
+    const recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang = "en-US";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = true;
+
+    recognition.maxAlternatives = 3;
+
+
+    let isListening = false;
+
+    let finalTranscript = "";
+
+
+    // ============================================
+    // MICROPHONE PERMISSION CHECK
+    // ============================================
+
+    async function requestMicrophone() {
 
         try {
 
-            recognition.start();
+            console.log(
+                "Requesting microphone permission..."
+            );
 
-        } catch (error) {
+
+            const stream =
+                await navigator.mediaDevices.getUserMedia({
+                    audio: true
+                });
+
+
+            console.log(
+                "Microphone permission granted!"
+            );
+
+
+            // Stop stream because SpeechRecognition
+            // will use the microphone itself
+
+            stream.getTracks().forEach(track => {
+
+                track.stop();
+
+            });
+
+
+            return true;
+
+        }
+        catch (error) {
 
             console.error(
-                "Could not start recognition:",
+                "Microphone permission error:",
                 error
             );
 
-            isListening = false;
-
-            voiceButton.classList.remove("listening");
 
             status.textContent =
-                "Could not start microphone.";
+                "❌ Please allow microphone access.";
+
+            speak(
+                "Please allow microphone access in your browser."
+            );
+
+
+            return false;
 
         }
 
-    });
+    }
 
 
-    // --------------------------------------------
-    // Recognition started
-    // --------------------------------------------
+    // ============================================
+    // START LISTENING
+    // ============================================
 
-    recognition.onstart = function () {
+    voiceButton.addEventListener(
+        "click",
+        async () => {
 
-        console.log("Microphone is listening.");
+            if (isListening) {
 
-        status.textContent =
-            "🎧 Listening... Speak now";
+                console.log(
+                    "Already listening."
+                );
 
-        voiceButton.classList.add("listening");
+                return;
+
+            }
+
+
+            // ----------------------------------------
+            // Check microphone permission
+            // ----------------------------------------
+
+            status.textContent =
+                "🎧 Checking microphone...";
+
+
+            const allowed =
+                await requestMicrophone();
+
+
+            if (!allowed) {
+
+                return;
+
+            }
+
+
+            // ----------------------------------------
+            // Start recognition
+            // ----------------------------------------
+
+            try {
+
+                finalTranscript = "";
+
+                console.log(
+                    "Starting speech recognition..."
+                );
+
+
+                status.textContent =
+                    "🎤 Listening... Speak now";
+
+
+                voiceButton.classList.add(
+                    "listening"
+                );
+
+
+                isListening = true;
+
+
+                recognition.start();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Recognition start error:",
+                    error
+                );
+
+
+                isListening = false;
+
+
+                voiceButton.classList.remove(
+                    "listening"
+                );
+
+
+                status.textContent =
+                    "❌ Could not start listening.";
+
+            }
+
+        }
+    );
+
+
+    // ============================================
+    // RECOGNITION STARTED
+    // ============================================
+
+    recognition.onstart = () => {
+
+        console.log(
+            "Recognition started successfully!"
+        );
+
 
         isListening = true;
+
+
+        voiceButton.classList.add(
+            "listening"
+        );
+
+
+        status.textContent =
+            "👂 I'm listening... speak now";
 
     };
 
 
-    // --------------------------------------------
-    // Speech detected
-    // --------------------------------------------
+    // ============================================
+    // SPEECH STARTED
+    // ============================================
 
-    recognition.onspeechstart = function () {
+    recognition.onspeechstart = () => {
 
-        console.log("Speech detected!");
+        console.log(
+            "Speech detected!"
+        );
+
 
         status.textContent =
             "👂 I can hear you...";
@@ -178,148 +371,237 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
 
-    // --------------------------------------------
-    // Speech ended
-    // --------------------------------------------
+    // ============================================
+    // SOUND DETECTED
+    // ============================================
 
-    recognition.onspeechend = function () {
+    recognition.onsoundstart = () => {
 
-        console.log("Speech ended.");
-
-        status.textContent =
-            "Processing your voice...";
+        console.log(
+            "Sound detected!"
+        );
 
     };
 
 
-    // --------------------------------------------
-    // RESULT
-    // --------------------------------------------
+    // ============================================
+    // SPEECH ENDED
+    // ============================================
 
-    recognition.onresult = function (event) {
+    recognition.onspeechend = () => {
 
-        console.log("Recognition result received.");
+        console.log(
+            "Speech ended."
+        );
 
-        if (
-            !event.results ||
-            !event.results.length
+
+        status.textContent =
+            "🧠 Understanding your command...";
+
+    };
+
+
+    // ============================================
+    // PROCESS RESULTS
+    // ============================================
+
+    recognition.onresult = event => {
+
+        console.log(
+            "Speech result received:",
+            event
+        );
+
+
+        let transcript = "";
+
+
+        for (
+            let i = event.resultIndex;
+            i < event.results.length;
+            i++
         ) {
 
-            console.log("No result received.");
+            transcript +=
+                event.results[i][0].transcript;
 
-            return;
+
+            if (
+                event.results[i].isFinal
+            ) {
+
+                finalTranscript +=
+                    event.results[i][0].transcript;
+
+            }
 
         }
 
 
-        const result =
-            event.results[0][0];
-
-
-        const transcript =
-            result.transcript
-                .toLowerCase()
-                .trim();
+        transcript =
+            transcript.trim();
 
 
         console.log(
-            "You said:",
+            "Heard:",
             transcript
         );
 
 
+        // Show live speech
+
+        if (transcript) {
+
+            status.textContent =
+                `You said: "${transcript}"`;
+
+        }
+
+
+        // Process final speech
+
+        if (finalTranscript.trim()) {
+
+            const command =
+                finalTranscript
+                    .toLowerCase()
+                    .trim();
+
+
+            console.log(
+                "Final command:",
+                command
+            );
+
+
+            processCommand(command);
+
+        }
+
+    };
+
+
+    // ============================================
+    // RECOGNITION ENDED
+    // ============================================
+
+    recognition.onend = () => {
+
         console.log(
-            "Confidence:",
-            result.confidence
+            "Recognition ended."
         );
 
 
-        status.textContent =
-            `You said: "${transcript}"`;
-
-
-        processCommand(transcript);
-
-    };
-
-
-    // --------------------------------------------
-    // Recognition ended
-    // --------------------------------------------
-
-    recognition.onend = function () {
-
-        console.log("Recognition ended.");
-
         isListening = false;
 
-        voiceButton.classList.remove("listening");
+
+        voiceButton.classList.remove(
+            "listening"
+        );
 
     };
 
 
-    // --------------------------------------------
-    // Recognition error
-    // --------------------------------------------
+    // ============================================
+    // ERROR HANDLING
+    // ============================================
 
-    recognition.onerror = function (event) {
+    recognition.onerror = event => {
 
         console.error(
-            "Speech recognition error:",
+            "Recognition error:",
             event.error
         );
 
 
         isListening = false;
 
-        voiceButton.classList.remove("listening");
+
+        voiceButton.classList.remove(
+            "listening"
+        );
 
 
-        switch (event.error) {
+        // ----------------------------------------
+        // NO SPEECH
+        // ----------------------------------------
 
-            case "not-allowed":
+        if (
+            event.error === "no-speech"
+        ) {
 
-                status.textContent =
-                    "❌ Microphone permission denied.";
+            status.textContent =
+                "🔇 I couldn't hear anything. Please try again.";
 
-                speak(
-                    "Please allow microphone access."
-                );
-
-                break;
-
-
-            case "no-speech":
-
-                status.textContent =
-                    "🔇 No speech detected. Please speak louder and try again.";
-
-                break;
-
-
-            case "audio-capture":
-
-                status.textContent =
-                    "❌ Microphone could not be accessed.";
-
-                break;
-
-
-            case "network":
-
-                status.textContent =
-                    "❌ Speech recognition network error.";
-
-                break;
-
-
-            default:
-
-                status.textContent =
-                    "❌ Voice recognition error: " +
-                    event.error;
+            return;
 
         }
+
+
+        // ----------------------------------------
+        // MICROPHONE DENIED
+        // ----------------------------------------
+
+        if (
+            event.error === "not-allowed" ||
+            event.error === "service-not-allowed"
+        ) {
+
+            status.textContent =
+                "❌ Microphone permission was denied.";
+
+            speak(
+                "Please allow microphone access."
+            );
+
+            return;
+
+        }
+
+
+        // ----------------------------------------
+        // AUDIO CAPTURE
+        // ----------------------------------------
+
+        if (
+            event.error === "audio-capture"
+        ) {
+
+            status.textContent =
+                "❌ No microphone was found.";
+
+            speak(
+                "I could not find a microphone."
+            );
+
+            return;
+
+        }
+
+
+        // ----------------------------------------
+        // NETWORK
+        // ----------------------------------------
+
+        if (
+            event.error === "network"
+        ) {
+
+            status.textContent =
+                "❌ Speech recognition needs an internet connection.";
+
+            return;
+
+        }
+
+
+        // ----------------------------------------
+        // OTHER ERROR
+        // ----------------------------------------
+
+        status.textContent =
+            "❌ Voice error: " +
+            event.error;
 
     };
 
@@ -342,18 +624,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (
             command.includes("home") ||
+            command.includes("go home") ||
             command.includes("main page")
         ) {
 
-            speak(
-                "Opening the home page."
+            respondAndNavigate(
+                "Opening the home page.",
+                "/"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/";
-
-            }, 800);
 
             return;
 
@@ -365,19 +643,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // ----------------------------------------
 
         if (
-            command.includes("games") ||
-            command.includes("game")
+            command.includes("game") ||
+            command.includes("games")
         ) {
 
-            speak(
-                "Opening the games."
+            respondAndNavigate(
+                "Opening your brain games.",
+                "/games"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/games";
-
-            }, 800);
 
             return;
 
@@ -393,15 +666,10 @@ document.addEventListener("DOMContentLoaded", function () {
             command.includes("reminders")
         ) {
 
-            speak(
-                "Opening your reminders."
+            respondAndNavigate(
+                "Opening your reminders.",
+                "/reminders"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/reminders";
-
-            }, 800);
 
             return;
 
@@ -417,15 +685,10 @@ document.addEventListener("DOMContentLoaded", function () {
             command.includes("activities")
         ) {
 
-            speak(
-                "Opening your activities."
+            respondAndNavigate(
+                "Opening your activities.",
+                "/activities"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/activities";
-
-            }, 800);
 
             return;
 
@@ -438,18 +701,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (
             command.includes("progress") ||
-            command.includes("performance")
+            command.includes("performance") ||
+            command.includes("my progress")
         ) {
 
-            speak(
-                "Opening your progress."
+            respondAndNavigate(
+                "Opening your progress.",
+                "/progress"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/progress";
-
-            }, 800);
 
             return;
 
@@ -465,15 +724,10 @@ document.addEventListener("DOMContentLoaded", function () {
             command.includes("my profile")
         ) {
 
-            speak(
-                "Opening your profile."
+            respondAndNavigate(
+                "Opening your profile.",
+                "/profile"
             );
-
-            setTimeout(function () {
-
-                window.location.href = "/profile";
-
-            }, 800);
 
             return;
 
@@ -489,12 +743,16 @@ document.addEventListener("DOMContentLoaded", function () {
             command.includes("what can you do")
         ) {
 
-            speak(
-                "You can say open games, open reminders, open activities, open progress, open profile, or go home."
-            );
+            const message =
+                "You can ask me to open games, reminders, activities, progress, profile, or home.";
+
 
             status.textContent =
-                "Try saying: Open Games";
+                "💡 Try saying: Open Games";
+
+
+            speak(message);
+
 
             return;
 
@@ -502,16 +760,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // ----------------------------------------
-        // UNKNOWN
+        // GREETING
         // ----------------------------------------
 
-        speak(
-            "Sorry, I did not understand that."
-        );
+        if (
+            command.includes("hello") ||
+            command.includes("hi")
+        ) {
+
+            const message =
+                "Hello! How can I help you today?";
+
+
+            status.textContent =
+                "😊 Hello! How can I help you?";
+
+
+            speak(message);
+
+
+            return;
+
+        }
+
+
+        // ----------------------------------------
+        // UNKNOWN COMMAND
+        // ----------------------------------------
+
+        const message =
+            "Sorry, I did not understand that. You can say open games, open reminders, or ask for help.";
+
 
         status.textContent =
-            "Try saying: Open Games or Open Reminders.";
+            "🤔 I didn't understand. Try saying: Open Games";
+
+
+        speak(message);
 
     }
+
+
+    // ============================================
+    // SPEAK + NAVIGATE
+    // ============================================
+
+    function respondAndNavigate(
+        message,
+        url
+    ) {
+
+        status.textContent =
+            "🤖 " + message;
+
+
+        speak(message);
+
+
+        // Give the assistant time to speak
+
+        setTimeout(() => {
+
+            window.location.href =
+                url;
+
+        }, 1800);
+
+    }
+
+
+    // ============================================
+    // INITIAL GREETING
+    // ============================================
+
+    console.log(
+        "Voice Assistant ready!"
+    );
 
 });

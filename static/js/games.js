@@ -52,7 +52,25 @@ const DIFFICULTY = {
     }
 };
 
-let currentDifficulty = "easy";
+/* =========================================================
+   AI ADAPTIVE DIFFICULTY
+   ========================================================= */
+
+let currentDifficulty =
+    localStorage.getItem(
+        "mindspaceRecommendedDifficulty"
+    ) || "easy";
+
+
+/* Make sure the value is valid */
+
+if (
+    !["easy", "medium", "hard"].includes(
+        currentDifficulty
+    )
+) {
+    currentDifficulty = "easy";
+}
 
 
 /* =========================================================
@@ -112,17 +130,34 @@ function escapeHTML(text) {
    DIFFICULTY BUTTONS
    ========================================================= */
 
-document.querySelectorAll(".difficulty-button").forEach(button => {
+/* =========================================================
+   DIFFICULTY BUTTONS + AI DEFAULT
+   ========================================================= */
+
+const difficultyButtons =
+    document.querySelectorAll(".difficulty-button");
+
+
+difficultyButtons.forEach(button => {
+
+    // Automatically highlight AI recommendation
+    if (
+        button.dataset.difficulty ===
+        currentDifficulty
+    ) {
+        button.classList.add("active");
+    }
 
     button.addEventListener("click", () => {
 
-        document
-            .querySelectorAll(".difficulty-button")
-            .forEach(item => item.classList.remove("active"));
+        difficultyButtons.forEach(item =>
+            item.classList.remove("active")
+        );
 
         button.classList.add("active");
 
-        currentDifficulty = button.dataset.difficulty;
+        currentDifficulty =
+            button.dataset.difficulty;
 
         resetGame();
     });

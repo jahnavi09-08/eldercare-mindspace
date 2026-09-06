@@ -17,6 +17,7 @@ from functools import wraps
 import os
 
 from database import init_db, get_db
+from ai_engine import get_ai_recommendation
 
 
 # =========================================================
@@ -30,15 +31,16 @@ app.secret_key = os.environ.get(
     "eldercare-mindspace-sih-2026-secret"
 )
 
-# Create database/tables when server starts.
+
+# =========================================================
+# INITIALIZE DATABASE
+# =========================================================
+
 init_db()
 
 
 # =========================================================
 # DATABASE MIGRATION
-# =========================================================
-# If your existing users table was created before the login
-# feature, add the new login columns without deleting data.
 # =========================================================
 
 def prepare_users_table():
@@ -68,7 +70,9 @@ def prepare_users_table():
 
     db.commit()
 
-    # Give the existing demo user a login username/password.
+
+    # Demo user Ravi
+
     ravi = db.execute(
         "SELECT * FROM users WHERE id = 1"
     ).fetchone()
@@ -121,7 +125,12 @@ def get_current_user():
 
     user = db.execute(
         """
-        SELECT id, name, age, username, created_at
+        SELECT
+            id,
+            name,
+            age,
+            username,
+            created_at
         FROM users
         WHERE id = ?
         """,
@@ -141,6 +150,7 @@ def login_required(function):
         if "user_id" not in session:
 
             # API request
+
             if request.path.startswith("/api/"):
 
                 return jsonify({
@@ -148,7 +158,9 @@ def login_required(function):
                     "message": "Please login first."
                 }), 401
 
-            return redirect(url_for("login"))
+            return redirect(
+                url_for("login")
+            )
 
         return function(*args, **kwargs)
 
@@ -172,12 +184,14 @@ def login():
             request.form.get("password", "")
         )
 
+
         if not username or not password:
 
             return render_template(
                 "login.html",
                 error="Please enter your username and password."
             )
+
 
         db = get_db()
 
@@ -192,6 +206,7 @@ def login():
 
         db.close()
 
+
         if not user:
 
             return render_template(
@@ -199,11 +214,16 @@ def login():
                 error="Invalid username or password."
             )
 
+
         password_hash = user["password_hash"]
 
-        if not password_hash or not check_password_hash(
-            password_hash,
-            password
+
+        if (
+            not password_hash
+            or not check_password_hash(
+                password_hash,
+                password
+            )
         ):
 
             return render_template(
@@ -211,14 +231,22 @@ def login():
                 error="Invalid username or password."
             )
 
+
         session.clear()
 
         session["user_id"] = user["id"]
 
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
+
 
     return render_template("login.html")
 
+
+# =========================================================
+# REGISTER
+# =========================================================
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -242,8 +270,14 @@ def register():
         )
 
         confirm_password = str(
-            request.form.get("confirm_password", "")
+            request.form.get(
+                "confirm_password",
+                ""
+            )
         )
+
+
+        # Validation
 
         if not name or not username or not password:
 
@@ -252,12 +286,14 @@ def register():
                 error="Please fill in all required fields."
             )
 
+
         if len(password) < 6:
 
             return render_template(
                 "register.html",
                 error="Password must be at least 6 characters."
             )
+
 
         if password != confirm_password:
 
@@ -266,11 +302,14 @@ def register():
                 error="Passwords do not match."
             )
 
+
         age = None
+
 
         if age_text:
 
             try:
+
                 age = int(age_text)
 
             except ValueError:
@@ -280,7 +319,9 @@ def register():
                     error="Please enter a valid age."
                 )
 
+
         db = get_db()
+
 
         existing_user = db.execute(
             """
@@ -291,6 +332,7 @@ def register():
             (username,)
         ).fetchone()
 
+
         if existing_user:
 
             db.close()
@@ -300,9 +342,11 @@ def register():
                 error="That username is already being used."
             )
 
+
         password_hash = generate_password_hash(
             password
         )
+
 
         cursor = db.execute(
             """
@@ -323,37 +367,49 @@ def register():
             )
         )
 
+
         user_id = cursor.lastrowid
+
 
         db.commit()
         db.close()
+
 
         session.clear()
 
         session["user_id"] = user_id
 
-        return redirect(url_for("home"))
+
+        return redirect(
+            url_for("home")
+        )
+
 
     return render_template("register.html")
 
+
+# =========================================================
+# LOGOUT
+# =========================================================
 
 @app.route("/logout")
 def logout():
 
     session.clear()
 
-    return redirect(url_for("login"))
+    return redirect(
+        url_for("login")
+    )
 
 
 # =========================================================
-# PAGE ROUTES
+# HOME PAGE
 # =========================================================
 
 @app.route("/")
 @login_required
 def home():
 
-    # Get currently logged-in user
     user = get_current_user()
 
     user_id = session["user_id"]
@@ -361,9 +417,9 @@ def home():
     db = get_db()
 
 
-    # ==========================================
-    # GET NEXT REMINDER
-    # ==========================================
+    # =====================================================
+    # NEXT REMINDER
+    # =====================================================
 
     reminder = db.execute(
         """
@@ -380,9 +436,9 @@ def home():
     ).fetchone()
 
 
-    # ==========================================
-    # GET NEXT ACTIVITY
-    # ==========================================
+    # =====================================================
+    # NEXT ACTIVITY
+    # =====================================================
 
     activity = db.execute(
         """
@@ -400,9 +456,9 @@ def home():
     ).fetchone()
 
 
-    # ==========================================
-    # GET GAME PROGRESS
-    # ==========================================
+    # =====================================================
+    # GAME PROGRESS
+    # =====================================================
 
     progress_data = db.execute(
         """
@@ -424,40 +480,53 @@ def home():
     db.close()
 
 
-    # ==========================================
-    # FORMAT REMINDER DATA
-    # ==========================================
+    # =====================================================
+    # FORMAT REMINDER
+    # =====================================================
 
     next_reminder = None
 
     if reminder:
 
         next_reminder = {
-            "title": reminder["title"],
-            "time": reminder["reminder_time"]
+
+            "title":
+                reminder["title"],
+
+            "time":
+                reminder["reminder_time"]
+
         }
 
 
-    # ==========================================
-    # FORMAT ACTIVITY DATA
-    # ==========================================
+    # =====================================================
+    # FORMAT ACTIVITY
+    # =====================================================
 
     next_activity = None
 
     if activity:
 
         next_activity = {
-            "activity_name": activity["activity_name"],
-            "duration": activity["duration"],
-            "time": activity["scheduled_time"]
+
+            "activity_name":
+                activity["activity_name"],
+
+            "duration":
+                activity["duration"],
+
+            "time":
+                activity["scheduled_time"]
+
         }
 
 
-    # ==========================================
-    # FORMAT PROGRESS DATA
-    # ==========================================
+    # =====================================================
+    # FORMAT PROGRESS
+    # =====================================================
 
     progress = None
+
 
     if progress_data:
 
@@ -473,21 +542,21 @@ def home():
         )
 
 
-        # Only show progress if the user
-        # has actually played at least one game
         if games_played > 0:
 
             progress = {
-                "games_played": games_played,
-                "average_accuracy": average_accuracy
+
+                "games_played":
+                    games_played,
+
+                "average_accuracy":
+                    average_accuracy
+
             }
 
 
-    # ==========================================
-    # SEND DATA TO HOME PAGE
-    # ==========================================
-
     return render_template(
+
         "index.html",
 
         user=user,
@@ -497,7 +566,13 @@ def home():
         next_activity=next_activity,
 
         progress=progress
+
     )
+
+
+# =========================================================
+# PAGE ROUTES
+# =========================================================
 
 @app.route("/games")
 @login_required
@@ -602,6 +677,7 @@ def api_games():
 
     ]
 
+
     return jsonify(games)
 
 
@@ -615,9 +691,11 @@ def api_game_result():
 
     user_id = session["user_id"]
 
+
     data = request.get_json(
         silent=True
     ) or {}
+
 
     game_name = str(
         data.get(
@@ -626,12 +704,18 @@ def api_game_result():
         )
     ).strip()
 
+
     difficulty = str(
         data.get(
             "difficulty",
             "easy"
         )
     ).strip().lower()
+
+
+    # =====================================================
+    # SCORE
+    # =====================================================
 
     try:
 
@@ -643,6 +727,11 @@ def api_game_result():
 
         score = 0
 
+
+    # =====================================================
+    # ACCURACY
+    # =====================================================
+
     try:
 
         accuracy = float(
@@ -652,6 +741,11 @@ def api_game_result():
     except (TypeError, ValueError):
 
         accuracy = 0
+
+
+    # =====================================================
+    # TIME TAKEN
+    # =====================================================
 
     try:
 
@@ -668,20 +762,28 @@ def api_game_result():
 
         time_taken = 0
 
+
+    # =====================================================
+    # VALIDATION
+    # =====================================================
+
     score = max(
         0,
         min(100, score)
     )
+
 
     accuracy = max(
         0,
         min(100, accuracy)
     )
 
+
     time_taken = max(
         0,
         time_taken
     )
+
 
     if difficulty not in [
         "easy",
@@ -691,7 +793,13 @@ def api_game_result():
 
         difficulty = "easy"
 
+
+    # =====================================================
+    # SAVE TO DATABASE
+    # =====================================================
+
     db = get_db()
+
 
     db.execute(
         """
@@ -716,17 +824,23 @@ def api_game_result():
         )
     )
 
+
     db.commit()
     db.close()
 
+
     return jsonify({
+
         "success": True,
-        "message": "Game result saved."
+
+        "message":
+            "Game result saved."
+
     })
 
 
 # =========================================================
-# PROGRESS API
+# PROGRESS API + AI ADAPTIVE ENGINE
 # =========================================================
 
 @app.get("/api/progress")
@@ -738,9 +852,9 @@ def api_progress():
     db = get_db()
 
 
-    # -----------------------------------------------------
-    # Recent game results
-    # -----------------------------------------------------
+    # =====================================================
+    # RECENT GAME RESULTS
+    # =====================================================
 
     results = db.execute(
         """
@@ -760,26 +874,31 @@ def api_progress():
     ).fetchall()
 
 
-    # -----------------------------------------------------
-    # Overall statistics
-    # -----------------------------------------------------
+    # =====================================================
+    # OVERALL STATISTICS
+    # =====================================================
 
     summary = db.execute(
         """
         SELECT
+
             COUNT(*) AS games_played,
+
             COALESCE(
                 AVG(accuracy),
                 0
             ) AS average_accuracy,
+
             COALESCE(
                 MAX(score),
                 0
             ) AS best_score,
+
             COALESCE(
                 AVG(score),
                 0
             ) AS average_score
+
         FROM game_results
         WHERE user_id = ?
         """,
@@ -787,78 +906,103 @@ def api_progress():
     ).fetchone()
 
 
-    # -----------------------------------------------------
-    # Performance by game
-    # -----------------------------------------------------
+    # =====================================================
+    # PERFORMANCE BY GAME
+    # =====================================================
 
     game_stats = db.execute(
         """
         SELECT
+
             game_name,
+
             COUNT(*) AS played,
+
             COALESCE(
                 AVG(accuracy),
                 0
             ) AS accuracy,
+
             COALESCE(
                 MAX(score),
                 0
             ) AS best_score,
+
             COALESCE(
                 AVG(time_taken),
                 0
             ) AS average_time
+
         FROM game_results
+
         WHERE user_id = ?
+
         GROUP BY game_name
+
         ORDER BY played DESC
         """,
         (user_id,)
     ).fetchall()
 
 
-    # -----------------------------------------------------
-    # Performance by difficulty
-    # -----------------------------------------------------
+    # =====================================================
+    # PERFORMANCE BY DIFFICULTY
+    # =====================================================
 
     difficulty_stats = db.execute(
         """
         SELECT
+
             difficulty,
+
             COUNT(*) AS played,
+
             COALESCE(
                 AVG(accuracy),
                 0
             ) AS accuracy,
+
             COALESCE(
                 MAX(score),
                 0
             ) AS best_score
+
         FROM game_results
+
         WHERE user_id = ?
+
         GROUP BY difficulty
+
         ORDER BY
+
             CASE difficulty
+
                 WHEN 'easy' THEN 1
                 WHEN 'medium' THEN 2
                 WHEN 'hard' THEN 3
+
                 ELSE 4
+
             END
         """,
         (user_id,)
     ).fetchall()
 
 
-    # -----------------------------------------------------
-    # Recent trend
-    # -----------------------------------------------------
+    # =====================================================
+    # RECENT PERFORMANCE TREND
+    # =====================================================
 
     trend_rows = db.execute(
         """
         SELECT accuracy
+
         FROM game_results
+
         WHERE user_id = ?
+
         ORDER BY id DESC
+
         LIMIT 10
         """,
         (user_id,)
@@ -868,76 +1012,101 @@ def api_progress():
     db.close()
 
 
-    # -----------------------------------------------------
-    # Convert database rows
-    # -----------------------------------------------------
+    # =====================================================
+    # CONVERT DATABASE RESULTS
+    # =====================================================
 
     result_list = [
+
         dict(row)
+
         for row in results
+
     ]
 
 
+    # =====================================================
+    # GAME STATISTICS
+    # =====================================================
+
     game_stats_list = []
+
 
     for row in game_stats:
 
         game_stats_list.append({
 
-            "game_name": row["game_name"],
+            "game_name":
+                row["game_name"],
 
-            "played": row["played"],
+            "played":
+                row["played"],
 
-            "accuracy": round(
-                float(row["accuracy"]),
-                1
-            ),
+            "accuracy":
+                round(
+                    float(row["accuracy"]),
+                    1
+                ),
 
-            "best_score": round(
-                float(row["best_score"]),
-                1
-            ),
+            "best_score":
+                round(
+                    float(row["best_score"]),
+                    1
+                ),
 
-            "average_time": round(
-                float(row["average_time"]),
-                1
-            )
+            "average_time":
+                round(
+                    float(row["average_time"]),
+                    1
+                )
 
         })
 
 
+    # =====================================================
+    # DIFFICULTY STATISTICS
+    # =====================================================
+
     difficulty_stats_list = []
+
 
     for row in difficulty_stats:
 
         difficulty_stats_list.append({
 
-            "difficulty": row["difficulty"],
+            "difficulty":
+                row["difficulty"],
 
-            "played": row["played"],
+            "played":
+                row["played"],
 
-            "accuracy": round(
-                float(row["accuracy"]),
-                1
-            ),
+            "accuracy":
+                round(
+                    float(row["accuracy"]),
+                    1
+                ),
 
-            "best_score": round(
-                float(row["best_score"]),
-                1
-            )
+            "best_score":
+                round(
+                    float(row["best_score"]),
+                    1
+                )
 
         })
 
 
-    # -----------------------------------------------------
-    # Calculate trend
-    # -----------------------------------------------------
+    # =====================================================
+    # PERFORMANCE TREND
+    # =====================================================
 
     trend = "starting"
 
+
     trend_message = (
+
         "Start playing games to see "
         "your memory progress."
+
     )
 
 
@@ -952,66 +1121,87 @@ def api_progress():
 
     if len(trend_values) >= 4:
 
+
         recent_values = trend_values[:5]
 
         previous_values = trend_values[5:10]
 
 
         recent_average = (
+
             sum(recent_values)
             / len(recent_values)
+
         )
 
 
         if previous_values:
 
+
             previous_average = (
+
                 sum(previous_values)
                 / len(previous_values)
+
             )
 
+
             difference = (
+
                 recent_average
                 - previous_average
+
             )
 
 
             if difference >= 5:
 
+
                 trend = "improving"
 
+
                 trend_message = (
+
                     "Your recent performance "
                     "is improving. Keep up "
                     "the good work!"
+
                 )
 
 
             elif difference <= -5:
 
+
                 trend = "needs_practice"
 
+
                 trend_message = (
+
                     "A little more practice "
                     "may help strengthen "
                     "your memory."
+
                 )
 
 
             else:
 
+
                 trend = "steady"
 
+
                 trend_message = (
+
                     "Your performance is "
                     "staying steady. Keep "
                     "practicing regularly."
+
                 )
 
 
-    # -----------------------------------------------------
-    # Overall values
-    # -----------------------------------------------------
+    # =====================================================
+    # OVERALL VALUES
+    # =====================================================
 
     games_played = int(
         summary["games_played"]
@@ -1042,62 +1232,113 @@ def api_progress():
     )
 
 
-    # -----------------------------------------------------
-    # Adaptive difficulty
-    # -----------------------------------------------------
+    # =====================================================
+    # CALCULATE AVERAGE COMPLETION TIME
+    # =====================================================
+
+    average_time = 0
+
+
+    if results:
+
+        time_values = [
+
+            float(
+                row["time_taken"] or 0
+            )
+
+            for row in results
+
+            if float(
+                row["time_taken"] or 0
+            ) > 0
+
+        ]
+
+
+        if time_values:
+
+            average_time = round(
+
+                sum(time_values)
+                / len(time_values),
+
+                1
+
+            )
+
+
+    # =====================================================
+    # AI-INSPIRED ADAPTIVE GAMING ENGINE
+    # =====================================================
 
     if games_played == 0:
 
-        recommended_difficulty = "easy"
 
-        recommendation = "Start with Easy"
+        ai_result = {
 
-        recommendation_message = (
-            "Begin with Easy games and "
-            "take your time to become "
-            "comfortable with the activities."
-        )
+            "difficulty":
+                "easy",
 
+            "message": (
 
-    elif average_accuracy >= 85:
+                "Start with Easy difficulty and "
+                "play a few games. MindSpace will "
+                "then analyze your performance and "
+                "personalize your next recommendation."
 
-        recommended_difficulty = "hard"
+            ),
 
-        recommendation = "Ready for Hard"
+            "performance_score":
+                0
 
-        recommendation_message = (
-            "Excellent work! You are "
-            "performing very well. You "
-            "can try Hard games for a "
-            "greater challenge."
-        )
-
-
-    elif average_accuracy >= 70:
-
-        recommended_difficulty = "medium"
-
-        recommendation = "Ready for Medium"
-
-        recommendation_message = (
-            "Good progress! Try Medium "
-            "games while continuing to "
-            "focus on accuracy."
-        )
+        }
 
 
     else:
 
-        recommended_difficulty = "easy"
 
-        recommendation = "Keep practicing Easy"
+        ai_result = get_ai_recommendation(
 
-        recommendation_message = (
-            "Keep practicing at Easy and "
-            "focus on accuracy rather "
-            "than speed."
+            average_accuracy=average_accuracy,
+
+            average_score=average_score,
+
+            average_time=average_time
+
         )
 
+
+    # =====================================================
+    # AI RECOMMENDATION
+    # =====================================================
+
+    recommended_difficulty = (
+        ai_result["difficulty"]
+    )
+
+
+    recommendation = (
+
+        "AI Recommended: "
+        + recommended_difficulty.capitalize()
+
+    )
+
+
+    recommendation_message = (
+        ai_result["message"]
+    )
+
+
+    performance_score = (
+        ai_result["performance_score"]
+    )
+
+
+    # =====================================================
+    # RETURN PROGRESS DATA
+    # =====================================================
 
     return jsonify({
 
@@ -1113,6 +1354,12 @@ def api_progress():
         "average_score":
             average_score,
 
+        "average_time":
+            average_time,
+
+
+        # AI DATA
+
         "recommended_difficulty":
             recommended_difficulty,
 
@@ -1122,11 +1369,20 @@ def api_progress():
         "recommendation_message":
             recommendation_message,
 
+        "ai_performance_score":
+            performance_score,
+
+
+        # TREND DATA
+
         "trend":
             trend,
 
         "trend_message":
             trend_message,
+
+
+        # GAME DATA
 
         "game_stats":
             game_stats_list,
@@ -1152,35 +1408,50 @@ def api_get_reminders():
 
     db = get_db()
 
+
     rows = db.execute(
         """
         SELECT
+
             id,
             title,
             description,
             reminder_time,
             type,
             completed
+
         FROM reminders
+
         WHERE user_id = ?
+
         ORDER BY reminder_time
         """,
         (user_id,)
     ).fetchall()
 
+
     db.close()
 
+
     return jsonify([
+
         dict(row)
+
         for row in rows
+
     ])
 
+
+# =========================================================
+# ADD REMINDER
+# =========================================================
 
 @app.post("/api/reminders")
 @login_required
 def api_add_reminder():
 
     user_id = session["user_id"]
+
 
     data = request.get_json(
         silent=True
@@ -1212,6 +1483,7 @@ def api_add_reminder():
 
     if not title or not reminder_time:
 
+
         return jsonify({
 
             "success": False,
@@ -1223,6 +1495,7 @@ def api_add_reminder():
 
 
     db = get_db()
+
 
     db.execute(
         """
@@ -1246,8 +1519,8 @@ def api_add_reminder():
         )
     )
 
-    db.commit()
 
+    db.commit()
     db.close()
 
 
@@ -1261,9 +1534,11 @@ def api_add_reminder():
     })
 
 
-@app.post(
-    "/api/reminders/<int:reminder_id>/complete"
-)
+# =========================================================
+# COMPLETE REMINDER
+# =========================================================
+
+@app.post("/api/reminders/<int:reminder_id>/complete")
 @login_required
 def api_complete_reminder(reminder_id):
 
@@ -1271,10 +1546,13 @@ def api_complete_reminder(reminder_id):
 
     db = get_db()
 
+
     db.execute(
         """
         UPDATE reminders
+
         SET completed = 1
+
         WHERE id = ?
         AND user_id = ?
         """,
@@ -1284,8 +1562,8 @@ def api_complete_reminder(reminder_id):
         )
     )
 
-    db.commit()
 
+    db.commit()
     db.close()
 
 
@@ -1311,34 +1589,49 @@ def api_get_activities():
 
     db = get_db()
 
+
     rows = db.execute(
         """
         SELECT
+
             id,
             activity_name,
             duration,
             scheduled_time,
             completed
+
         FROM activities
+
         WHERE user_id = ?
+
         ORDER BY scheduled_time
         """,
         (user_id,)
     ).fetchall()
 
+
     db.close()
 
+
     return jsonify([
+
         dict(row)
+
         for row in rows
+
     ])
 
+
+# =========================================================
+# ADD ACTIVITY
+# =========================================================
 
 @app.post("/api/activities")
 @login_required
 def api_add_activity():
 
     user_id = session["user_id"]
+
 
     data = request.get_json(
         silent=True
@@ -1371,6 +1664,7 @@ def api_add_activity():
 
     if not activity_name or not scheduled_time:
 
+
         return jsonify({
 
             "success": False,
@@ -1382,6 +1676,7 @@ def api_add_activity():
 
 
     db = get_db()
+
 
     db.execute(
         """
@@ -1403,8 +1698,8 @@ def api_add_activity():
         )
     )
 
-    db.commit()
 
+    db.commit()
     db.close()
 
 
@@ -1418,9 +1713,11 @@ def api_add_activity():
     })
 
 
-@app.post(
-    "/api/activities/<int:activity_id>/complete"
-)
+# =========================================================
+# COMPLETE ACTIVITY
+# =========================================================
+
+@app.post("/api/activities/<int:activity_id>/complete")
 @login_required
 def api_complete_activity(activity_id):
 
@@ -1428,10 +1725,13 @@ def api_complete_activity(activity_id):
 
     db = get_db()
 
+
     db.execute(
         """
         UPDATE activities
+
         SET completed = 1
+
         WHERE id = ?
         AND user_id = ?
         """,
@@ -1441,8 +1741,8 @@ def api_complete_activity(activity_id):
         )
     )
 
-    db.commit()
 
+    db.commit()
     db.close()
 
 
