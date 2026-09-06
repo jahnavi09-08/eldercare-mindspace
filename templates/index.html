@@ -2,14 +2,16 @@
 {% block title %}Home | MindSpace{% endblock %}
 
 {% block content %}
+
 <section class="hero">
     <div>
         <p class="eyebrow">WELCOME BACK</p>
-        <h1>Good morning, Ravi 👋</h1>
+        <h1>Hello {{ user.name }}!</h1>
         <p class="hero-text">
             Let's make today a little brighter with a few simple activities.
         </p>
     </div>
+
     <div class="mood-card">
         <p>How are you feeling?</p>
         <div class="moods">
@@ -20,80 +22,221 @@
     </div>
 </section>
 
+
 <section class="featured-game">
     <div class="featured-icon">🧠</div>
+
     <div class="featured-copy">
         <p class="eyebrow">TODAY'S BRAIN EXERCISE</p>
         <h2>Sequence Memory</h2>
-        <p>Remember a short sequence of blocks and repeat it.</p>
-        <a class="primary-button" href="{{ url_for('game', game_name='sequence') }}">
+
+        <p>
+            Remember a short sequence of blocks and repeat it.
+        </p>
+
+        <a class="primary-button"
+           href="{{ url_for('game', game_name='sequence') }}">
             Start Game →
         </a>
     </div>
 </section>
 
+
 <section class="section">
+
     <div class="section-heading">
         <div>
             <p class="eyebrow">TODAY</p>
             <h2>Your plan</h2>
         </div>
-        <a href="{{ url_for('reminders') }}">See all →</a>
+
+        <a href="{{ url_for('reminders') }}">
+            See all →
+        </a>
     </div>
+
 
     <div class="dashboard-grid">
+
+        <!-- NEXT REMINDER -->
         <article class="info-card">
+
             <div class="card-icon">⏰</div>
+
             <h3>Next Reminder</h3>
-            <strong>Evening Walk</strong>
-            <p>Today at 6:00 PM</p>
+
+            {% if next_reminder %}
+
+                <strong>
+                    {{ next_reminder.title }}
+                </strong>
+
+                <p>
+                    {{ next_reminder.time }}
+                </p>
+
+            {% else %}
+
+                <strong>
+                    No reminders
+                </strong>
+
+                <p>
+                    You don't have any reminders yet.
+                </p>
+
+            {% endif %}
+
         </article>
 
+
+        <!-- ACTIVITY -->
         <article class="info-card">
+
             <div class="card-icon">🏃</div>
+
             <h3>Activity</h3>
-            <strong>Gentle Stretching</strong>
-            <p>5 minutes</p>
+
+            {% if next_activity %}
+
+                <strong>
+                    {{ next_activity.activity_name }}
+                </strong>
+
+                <p>
+                    {{ next_activity.duration }} minutes
+                </p>
+
+            {% else %}
+
+                <strong>
+                    No activity planned
+                </strong>
+
+                <p>
+                    Add a gentle activity for today.
+                </p>
+
+            {% endif %}
+
         </article>
 
+
+        <!-- PROGRESS -->
         <article class="info-card">
+
             <div class="card-icon">📊</div>
+
             <h3>Progress</h3>
-            <strong>Keep going!</strong>
-            <p>Your recent sessions are saved automatically.</p>
+
+            {% if progress %}
+
+                <strong>
+                    {{ progress.average_accuracy }}% accuracy
+                </strong>
+
+                <p>
+                    {{ progress.games_played }} game(s) played
+                </p>
+
+            {% else %}
+
+                <strong>
+                    Start your journey!
+                </strong>
+
+                <p>
+                    Play a game to begin tracking progress.
+                </p>
+
+            {% endif %}
+
         </article>
+
     </div>
+
 </section>
 
+
 <section class="section">
+
     <div class="section-heading">
+
         <div>
             <p class="eyebrow">EXPLORE</p>
             <h2>What would you like to do?</h2>
         </div>
+
     </div>
 
+
     <div class="quick-grid">
-        <a class="quick-card" href="{{ url_for('games') }}">
+
+        <a class="quick-card"
+           href="{{ url_for('games') }}">
+
             <span>🧠</span>
-            <strong>Play a Game</strong>
-            <small>Exercise your memory</small>
+
+            <strong>
+                Play a Game
+            </strong>
+
+            <small>
+                Exercise your memory
+            </small>
+
         </a>
-        <a class="quick-card" href="{{ url_for('reminders') }}">
+
+
+        <a class="quick-card"
+           href="{{ url_for('reminders') }}">
+
             <span>⏰</span>
-            <strong>View Reminders</strong>
-            <small>Stay on track</small>
+
+            <strong>
+                View Reminders
+            </strong>
+
+            <small>
+                Stay on track
+            </small>
+
         </a>
-        <a class="quick-card" href="{{ url_for('activities') }}">
+
+
+        <a class="quick-card"
+           href="{{ url_for('activities') }}">
+
             <span>🚶</span>
-            <strong>Daily Activity</strong>
-            <small>Move gently</small>
+
+            <strong>
+                Daily Activity
+            </strong>
+
+            <small>
+                Move gently
+            </small>
+
         </a>
-        <a class="quick-card" href="{{ url_for('progress') }}">
+
+
+        <a class="quick-card"
+           href="{{ url_for('progress') }}">
+
             <span>📈</span>
-            <strong>My Progress</strong>
-            <small>See your journey</small>
+
+            <strong>
+                My Progress
+            </strong>
+
+            <small>
+                See your journey
+            </small>
+
         </a>
+
     </div>
+
 </section>
+
 {% endblock %}

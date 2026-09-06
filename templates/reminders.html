@@ -1,46 +1,636 @@
 {% extends "base.html" %}
-{% block title %}Reminders | MindSpace{% endblock %}
 
 {% block content %}
-<section class="page-header">
-    <p class="eyebrow">STAY ON TRACK</p>
-    <h1>Today's reminders ⏰</h1>
-    <p>Small reminders can make the day easier.</p>
-</section>
 
-<div class="two-column">
-    <section>
-        <div id="reminderList" class="stack-list">
-            <div class="loading">Loading reminders...</div>
+<style>
+    /* =========================================
+       REMINDERS PAGE
+       ========================================= */
+
+    .reminders-page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding-bottom: 50px;
+    }
+
+    /* ---------- HEADER ---------- */
+
+    .reminders-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .reminders-header h1 {
+        margin: 0 0 8px;
+        font-size: 36px;
+        font-weight: 700;
+        color: #26342d;
+    }
+
+    .reminders-header p {
+        margin: 0;
+        font-size: 18px;
+        color: #68756e;
+    }
+
+
+    /* =========================================
+       REMINDER CARDS
+       ========================================= */
+
+    #reminderList {
+        margin-bottom: 35px;
+    }
+
+    .reminder-card {
+        background: #ffffff;
+        border: 1px solid #dce4de;
+        border-radius: 20px;
+        padding: 22px 24px;
+        margin-bottom: 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        box-shadow: 0 4px 14px rgba(38, 52, 45, 0.07);
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .reminder-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(38, 52, 45, 0.11);
+    }
+
+
+    /* Reminder information */
+
+    .reminder-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .reminder-info h3 {
+        margin: 0 0 7px;
+        font-size: 21px;
+        color: #26342d;
+    }
+
+    .reminder-info p {
+        margin: 4px 0;
+        font-size: 16px;
+        color: #68756e;
+    }
+
+    .reminder-time {
+        font-size: 18px !important;
+        font-weight: 700;
+        color: #4d765d !important;
+    }
+
+
+    /* =========================================
+       MARK DONE BUTTON
+       ========================================= */
+
+    /*
+       This works with the .complete-btn class
+       created by reminders.js.
+    */
+
+    .complete-btn {
+        flex-shrink: 0;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        min-width: 125px;
+        min-height: 48px;
+
+        padding: 10px 20px;
+
+        border: 2px solid #4d765d;
+        border-radius: 14px;
+
+        background: #ffffff;
+        color: #385842;
+
+        font-size: 16px;
+        font-weight: 700;
+        font-family: inherit;
+
+        cursor: pointer;
+
+        box-shadow: 0 3px 8px rgba(77, 118, 93, 0.12);
+
+        transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.15s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    /* Hover */
+
+    .complete-btn:hover {
+        background: #4d765d;
+        color: #ffffff;
+        border-color: #4d765d;
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 6px 14px rgba(77, 118, 93, 0.22);
+    }
+
+
+    /* Click */
+
+    .complete-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(77, 118, 93, 0.15);
+    }
+
+
+    /* Keyboard accessibility */
+
+    .complete-btn:focus-visible {
+        outline: 3px solid rgba(77, 118, 93, 0.30);
+        outline-offset: 3px;
+    }
+
+
+    /* =========================================
+       COMPLETED STATE
+       ========================================= */
+
+    .complete-btn.completed {
+        background: #e8f0e9;
+        color: #385842;
+        border-color: #b8cdbd;
+
+        cursor: default;
+
+        box-shadow: none;
+    }
+
+    .complete-btn.completed:hover {
+        transform: none;
+        background: #e8f0e9;
+        color: #385842;
+        border-color: #b8cdbd;
+        box-shadow: none;
+    }
+
+
+    /* =========================================
+       EMPTY STATE
+       ========================================= */
+
+    .empty-reminders {
+        background: #ffffff;
+        border: 2px dashed #dce4de;
+        border-radius: 20px;
+
+        padding: 35px 20px;
+
+        text-align: center;
+
+        color: #68756e;
+        font-size: 18px;
+    }
+
+
+    /* =========================================
+       ADD REMINDER CARD
+       ========================================= */
+
+    .add-reminder-card {
+        background: #ffffff;
+        border: 1px solid #dce4de;
+        border-radius: 22px;
+
+        padding: 30px;
+
+        box-shadow: 0 5px 18px rgba(38, 52, 45, 0.07);
+    }
+
+    .add-reminder-card h2 {
+        margin: 0 0 7px;
+
+        font-size: 27px;
+        color: #385842;
+    }
+
+    .form-subtitle {
+        margin: 0 0 25px;
+
+        font-size: 16px;
+        line-height: 1.5;
+        color: #68756e;
+    }
+
+
+    /* =========================================
+       FORM
+       ========================================= */
+
+    .reminder-form {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        margin-bottom: 8px;
+
+        font-size: 17px;
+        font-weight: 700;
+
+        color: #26342d;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 13px 15px;
+
+        border: 2px solid #dce4de;
+        border-radius: 12px;
+
+        background: #fbfcfb;
+        color: #26342d;
+
+        font-family: inherit;
+        font-size: 16px;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .form-group input,
+    .form-group select {
+        min-height: 52px;
+    }
+
+    .form-group textarea {
+        min-height: 105px;
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #4d765d;
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 3px rgba(77, 118, 93, 0.12);
+    }
+
+
+    /* =========================================
+       ADD REMINDER BUTTON
+       ========================================= */
+
+    .reminder-submit-area {
+        grid-column: 1 / -1;
+
+        display: flex;
+        justify-content: flex-end;
+
+        margin-top: 4px;
+    }
+
+    .add-reminder-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        min-height: 54px;
+
+        padding: 0 28px;
+
+        border: none;
+        border-radius: 14px;
+
+        background: #4d765d;
+        color: #ffffff;
+
+        font-family: inherit;
+        font-size: 17px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        box-shadow: 0 5px 12px rgba(77, 118, 93, 0.20);
+
+        transition:
+            background 0.2s ease,
+            transform 0.15s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .add-reminder-btn:hover {
+        background: #385842;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 8px 17px rgba(77, 118, 93, 0.25);
+    }
+
+    .add-reminder-btn:active {
+        transform: translateY(0);
+    }
+
+    .add-reminder-btn:focus-visible {
+        outline: 3px solid rgba(77, 118, 93, 0.30);
+        outline-offset: 3px;
+    }
+
+
+    /* =========================================
+       SUCCESS MESSAGE
+       ========================================= */
+
+    .reminder-success {
+        margin-top: 15px;
+
+        padding: 13px 16px;
+
+        border-radius: 12px;
+
+        background: #e8f0e9;
+        color: #385842;
+
+        font-size: 16px;
+        font-weight: 600;
+
+        text-align: center;
+    }
+
+
+    /* =========================================
+       MOBILE
+       ========================================= */
+
+    @media (max-width: 750px) {
+
+        .reminders-page {
+            padding: 0 10px 35px;
+        }
+
+        .reminders-header h1 {
+            font-size: 30px;
+        }
+
+        .reminder-card {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .complete-btn {
+            width: 100%;
+        }
+
+        .reminder-form {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: auto;
+        }
+
+        .reminder-submit-area {
+            grid-column: auto;
+        }
+
+        .add-reminder-btn {
+            width: 100%;
+        }
+
+        .add-reminder-card {
+            padding: 22px;
+        }
+    }
+
+
+    /* =========================================
+       SMALL MOBILE
+       ========================================= */
+
+    @media (max-width: 450px) {
+
+        .reminders-header h1 {
+            font-size: 27px;
+        }
+
+        .reminders-header p {
+            font-size: 16px;
+        }
+
+        .reminder-card {
+            padding: 18px;
+        }
+
+        .reminder-info h3 {
+            font-size: 19px;
+        }
+
+        .complete-btn {
+            min-height: 50px;
+            font-size: 16px;
+        }
+    }
+</style>
+
+
+<div class="reminders-page">
+
+    <!-- =====================================
+         PAGE HEADER
+         ===================================== -->
+
+    <div class="reminders-header">
+
+        <h1>Today's Reminders ⏰</h1>
+
+        <p>
+            Stay on track with your daily routine
+        </p>
+
+    </div>
+
+
+    <!-- =====================================
+         REMINDER LIST
+         ===================================== -->
+
+    <div id="reminderList">
+
+        <div class="empty-reminders">
+            Loading reminders...
         </div>
+
+    </div>
+
+
+    <!-- =====================================
+         ADD REMINDER
+         ===================================== -->
+
+    <section class="add-reminder-card">
+
+        <h2>➕ Add a Reminder</h2>
+
+        <p class="form-subtitle">
+            Create a reminder for medicines, activities,
+            meals, appointments, or daily routines.
+        </p>
+
+
+        <form
+            id="reminderForm"
+            class="reminder-form"
+        >
+
+            <!-- Reminder Title -->
+
+            <div class="form-group">
+
+                <label for="reminderTitle">
+                    Reminder Title
+                </label>
+
+                <input
+                    type="text"
+                    id="reminderTitle"
+                    placeholder="Example: Take morning medicine"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Reminder Time -->
+
+            <div class="form-group">
+
+                <label for="reminderTime">
+                    Reminder Time
+                </label>
+
+                <input
+                    type="time"
+                    id="reminderTime"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Reminder Type -->
+
+            <div class="form-group">
+
+                <label for="reminderType">
+                    Reminder Type
+                </label>
+
+                <select
+                    id="reminderType"
+                    required
+                >
+
+                    <option value="Health">
+                        💊 Health
+                    </option>
+
+                    <option value="Activity">
+                        🚶 Activity
+                    </option>
+
+                    <option value="Wellness">
+                        🌿 Wellness
+                    </option>
+
+                    <option value="Brain">
+                        🧠 Brain Exercise
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Description -->
+
+            <div class="form-group">
+
+                <label for="reminderDescription">
+                    Description
+                </label>
+
+                <input
+                    type="text"
+                    id="reminderDescription"
+                    placeholder="Example: Take after breakfast"
+                >
+
+            </div>
+
+
+            <!-- Add Button -->
+
+            <div class="reminder-submit-area">
+
+                <button
+                    type="submit"
+                    class="add-reminder-btn"
+                >
+                    ✓&nbsp; Add Reminder
+                </button>
+
+            </div>
+
+        </form>
+
     </section>
 
-    <aside class="form-card">
-        <h2>Add a reminder</h2>
-        <form id="reminderForm">
-            <label>What should we remember?</label>
-            <input id="reminderTitle" required placeholder="Example: Take medicine">
-
-            <label>Time</label>
-            <input id="reminderTime" type="time" required>
-
-            <label>Type</label>
-            <select id="reminderType">
-                <option>Health</option>
-                <option>Activity</option>
-                <option>Wellness</option>
-                <option>Brain</option>
-            </select>
-
-            <label>Note</label>
-            <textarea id="reminderDescription" placeholder="Optional note"></textarea>
-
-            <button class="primary-button" type="submit">+ Add Reminder</button>
-        </form>
-    </aside>
 </div>
-{% endblock %}
 
-{% block scripts %}
+
+<!-- =========================================
+     REMINDERS JAVASCRIPT
+     ========================================= -->
+
 <script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
+
 {% endblock %}

@@ -1,40 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}MindSpace{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/game-extra.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/game-extra.css') }}">
+
 </head>
+
+
 <body>
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
     <header class="topbar">
+
+        <!-- LOGO -->
+
         <a class="brand" href="{{ url_for('home') }}">
+
             <span class="brand-icon">🌿</span>
+
             <span>MindSpace</span>
+
         </a>
 
+
+        <!-- NAVIGATION -->
+
         <nav class="nav">
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('games') }}">Games</a>
-            <a href="{{ url_for('reminders') }}">Reminders</a>
-            <a href="{{ url_for('progress') }}">Progress</a>
-            <a href="{{ url_for('activities') }}">Activities</a>
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('games') }}">
+                Games
+            </a>
+
+            <a href="{{ url_for('reminders') }}">
+                Reminders
+            </a>
+
+            <a href="{{ url_for('progress') }}">
+                Progress
+            </a>
+
+            <a href="{{ url_for('activities') }}">
+                Activities
+            </a>
+
         </nav>
 
-        <a class="profile-button" href="{{ url_for('profile') }}">👤</a>
+
+        <!-- USER SECTION -->
+
+        <div class="user-nav">
+
+            <a
+                class="user-profile"
+                href="{{ url_for('profile') }}"
+                title="View Profile"
+            >
+
+                <span class="user-icon">
+                    👤
+                </span>
+
+                <span class="user-name">
+                    {{ user.name }}
+                </span>
+
+            </a>
+
+
+            <a
+                class="logout-button"
+                href="{{ url_for('logout') }}"
+                title="Logout from MindSpace"
+            >
+                🚪 Logout
+            </a>
+
+        </div>
+
     </header>
 
+
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
+
     <main class="page-container">
+
         {% block content %}{% endblock %}
+
     </main>
 
+
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
     <footer class="footer">
+
         <span>🌿 MindSpace</span>
-        <span>Simple. Calm. Caring.</span>
+
+        <span>
+            Simple. Calm. Caring.
+        </span>
+
     </footer>
 
+
+    <!-- ==========================================
+         JAVASCRIPT
+    =========================================== -->
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Voice Assistant -->
+
+    <script
+        src="{{ url_for('static', filename='js/voice-assistant.js') }}">
+    </script>
+
     {% block scripts %}{% endblock %}
+
 </body>
+
 </html>
