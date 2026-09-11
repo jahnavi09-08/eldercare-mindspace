@@ -4,12 +4,27 @@
 
 {% block content %}
 
+<!-- ============================= -->
+<!-- PAGE HEADER -->
+<!-- ============================= -->
+
 <section class="page-header">
-    <p class="eyebrow">YOUR JOURNEY</p>
 
-    <h1>Your progress 📊</h1>
+    <p
+        class="eyebrow"
+        data-translate="yourJourney"
+    >
+        YOUR JOURNEY
+    </p>
 
-    <p>Every little step counts.</p>
+    <h1 data-translate="yourProgress">
+        Your progress 📊
+    </h1>
+
+    <p data-translate="everyStepCounts">
+        Every little step counts.
+    </p>
+
 </section>
 
 
@@ -25,7 +40,9 @@
 
         <strong id="gamesPlayed">0</strong>
 
-        <p>Games Played</p>
+        <p data-translate="gamesPlayed">
+            Games Played
+        </p>
 
     </article>
 
@@ -36,7 +53,9 @@
 
         <strong id="averageAccuracy">0%</strong>
 
-        <p>Average Accuracy</p>
+        <p data-translate="averageAccuracy">
+            Average Accuracy
+        </p>
 
     </article>
 
@@ -45,9 +64,13 @@
 
         <span>🌱</span>
 
-        <strong>Keep Going</strong>
+        <strong data-translate="keepGoing">
+            Keep Going
+        </strong>
 
-        <p>Consistency matters</p>
+        <p data-translate="consistencyMatters">
+            Consistency matters
+        </p>
 
     </article>
 
@@ -70,11 +93,14 @@
 
             <div>
 
-                <p class="eyebrow">
+                <p
+                    class="eyebrow"
+                    data-translate="aiInspiredGaming"
+                >
                     AI-INSPIRED ADAPTIVE GAMING
                 </p>
 
-                <h2>
+                <h2 data-translate="personalizedRecommendation">
                     Your Personalized Recommendation
                 </h2>
 
@@ -85,13 +111,17 @@
 
         <div class="ai-recommendation">
 
-            <p class="ai-label">
+            <p
+                class="ai-label"
+                data-translate="recommendedDifficulty"
+            >
                 Recommended Difficulty
             </p>
 
             <div
                 id="aiDifficulty"
                 class="ai-difficulty"
+                data-translate="loading"
             >
                 Loading...
             </div>
@@ -102,6 +132,7 @@
         <p
             id="aiMessage"
             class="ai-message"
+            data-translate="analyzingGamePerformance"
         >
             MindSpace is analyzing your game performance...
         </p>
@@ -110,32 +141,56 @@
         <div class="ai-analysis">
 
             <p>
-                📊 <strong>Accuracy</strong>
+
+                📊
+
+                <strong data-translate="accuracy">
+                    Accuracy
+                </strong>
+
                 <span id="aiAccuracy">
                     --
                 </span>
+
             </p>
 
 
             <p>
-                🏆 <strong>Average Score</strong>
+
+                🏆
+
+                <strong data-translate="averageScore">
+                    Average Score
+                </strong>
+
                 <span id="aiScore">
                     --
                 </span>
+
             </p>
 
 
             <p>
-                ⏱️ <strong>Completion Time</strong>
+
+                ⏱️
+
+                <strong data-translate="completionTime">
+                    Completion Time
+                </strong>
+
                 <span id="aiTime">
                     --
                 </span>
+
             </p>
 
         </div>
 
 
-        <p class="ai-footer">
+        <p
+            class="ai-footer"
+            data-translate="aiFooter"
+        >
 
             🤖 MindSpace analyzes your performance to
             personalize your next gaming challenge.
@@ -157,11 +212,14 @@
 
         <div>
 
-            <p class="eyebrow">
+            <p
+                class="eyebrow"
+                data-translate="recentSessions"
+            >
                 RECENT SESSIONS
             </p>
 
-            <h2>
+            <h2 data-translate="gameHistory">
                 Game history
             </h2>
 
@@ -175,7 +233,10 @@
         class="stack-list"
     >
 
-        <div class="loading">
+        <div
+            class="loading"
+            data-translate="loadingProgress"
+        >
 
             Loading progress...
 

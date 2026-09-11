@@ -1,33 +1,250 @@
+/* =========================================================
+   MINDSPACE - PROGRESS
+   MULTI-LANGUAGE SUPPORT
+   ========================================================= */
+
+
+/* =========================================================
+   GET CURRENT LANGUAGE
+   ========================================================= */
+
+function getCurrentLanguage() {
+
+    return localStorage.getItem(
+        "mindspaceLanguage"
+    ) || "en";
+
+}
+
+
+/* =========================================================
+   GET TRANSLATED TEXT
+   ========================================================= */
+
+function t(key, fallback = "") {
+
+    const language =
+        getCurrentLanguage();
+
+    if (
+        typeof translations !== "undefined" &&
+        translations[language] &&
+        translations[language][key]
+    ) {
+
+        return translations[language][key];
+
+    }
+
+
+    if (
+        typeof translations !== "undefined" &&
+        translations.en &&
+        translations.en[key]
+    ) {
+
+        return translations.en[key];
+
+    }
+
+
+    return fallback;
+
+}
+
+
+/* =========================================================
+   TRANSLATE DIFFICULTY
+   ========================================================= */
+
+function difficultyLabel(difficulty) {
+
+    const level =
+        String(difficulty || "easy").toLowerCase();
+
+
+    if (level === "easy") {
+
+        return t("easy", "Easy");
+
+    }
+
+
+    if (level === "medium") {
+
+        return t("medium", "Medium");
+
+    }
+
+
+    if (level === "hard") {
+
+        return t("hard", "Hard");
+
+    }
+
+
+    return t("easy", "Easy");
+
+}
+
+
+/* =========================================================
+   DIFFICULTY CSS CLASS
+   ========================================================= */
+
+function difficultyClass(difficulty) {
+
+    const level =
+        String(difficulty || "")
+            .toLowerCase();
+
+
+    if (level === "easy") return "easy";
+
+    if (level === "medium") return "medium";
+
+    if (level === "hard") return "hard";
+
+    return "";
+
+}
+
+
+/* =========================================================
+   TREND TITLE
+   ========================================================= */
+
+function getTrendTitle(trend) {
+
+    if (trend === "improving") {
+
+        return t(
+            "youAreImproving",
+            "You're improving!"
+        );
+
+    }
+
+
+    if (trend === "needs_practice") {
+
+        return t(
+            "keepPracticing",
+            "Keep practicing"
+        );
+
+    }
+
+
+    if (trend === "starting") {
+
+        return t(
+            "greatStart",
+            "Great start!"
+        );
+
+    }
+
+
+    return t(
+        "keepGoing",
+        "Keep going!"
+    );
+
+}
+
+
+/* =========================================================
+   TREND ICON
+   ========================================================= */
+
+function getTrendIcon(trend) {
+
+    if (trend === "improving") {
+
+        return "📈";
+
+    }
+
+
+    if (trend === "needs_practice") {
+
+        return "💪";
+
+    }
+
+
+    if (trend === "starting") {
+
+        return "🌱";
+
+    }
+
+
+    return "➡️";
+
+}
+
+
+/* =========================================================
+   LOAD PROGRESS
+   ========================================================= */
+
 async function loadProgress() {
 
-    const list = document.getElementById("progressList");
+    const list =
+        document.getElementById(
+            "progressList"
+        );
+
+
+    if (!list) {
+
+        return;
+
+    }
+
 
     try {
 
-        const response = await fetch("/api/progress");
+        const response =
+            await fetch("/api/progress");
+
 
         if (!response.ok) {
-            throw new Error("Failed to load progress");
+
+            throw new Error(
+                "Failed to load progress"
+            );
+
         }
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
 
 
-        // =================================================
-        // TOP SUMMARY CARDS
-        // =================================================
+        /* =============================================
+           TOP SUMMARY CARDS
+           ============================================= */
 
         const gamesPlayed =
-            document.getElementById("gamesPlayed");
+            document.getElementById(
+                "gamesPlayed"
+            );
+
 
         const averageAccuracy =
-            document.getElementById("averageAccuracy");
+            document.getElementById(
+                "averageAccuracy"
+            );
 
 
         if (gamesPlayed) {
 
             gamesPlayed.textContent =
-                data.games_played;
+                data.games_played || 0;
 
         }
 
@@ -35,43 +252,57 @@ async function loadProgress() {
         if (averageAccuracy) {
 
             averageAccuracy.textContent =
-                `${data.average_accuracy}%`;
+                `${data.average_accuracy || 0}%`;
 
         }
 
 
-        // =================================================
-        // AI ADAPTIVE GAMING CARD
-        // =================================================
+        /* =============================================
+           AI ADAPTIVE GAMING CARD
+           ============================================= */
 
         const aiDifficulty =
-            document.getElementById("aiDifficulty");
+            document.getElementById(
+                "aiDifficulty"
+            );
+
 
         const aiMessage =
-            document.getElementById("aiMessage");
+            document.getElementById(
+                "aiMessage"
+            );
+
 
         const aiAccuracy =
-            document.getElementById("aiAccuracy");
+            document.getElementById(
+                "aiAccuracy"
+            );
+
 
         const aiScore =
-            document.getElementById("aiScore");
+            document.getElementById(
+                "aiScore"
+            );
+
 
         const aiTime =
-            document.getElementById("aiTime");
+            document.getElementById(
+                "aiTime"
+            );
 
 
         if (aiDifficulty) {
 
             const difficulty =
-                data.recommended_difficulty || "easy";
+                data.recommended_difficulty ||
+                "easy";
 
 
             aiDifficulty.textContent =
-                difficulty.charAt(0).toUpperCase()
-                + difficulty.slice(1);
+                difficultyLabel(
+                    difficulty
+                );
 
-
-            // Remove previous difficulty classes
 
             aiDifficulty.classList.remove(
                 "easy",
@@ -80,10 +311,10 @@ async function loadProgress() {
             );
 
 
-            // Add current difficulty class
-
             aiDifficulty.classList.add(
-                difficulty
+                difficultyClass(
+                    difficulty
+                )
             );
 
         }
@@ -92,8 +323,11 @@ async function loadProgress() {
         if (aiMessage) {
 
             aiMessage.textContent =
-                data.recommendation_message
-                || "Play more games to receive a personalized recommendation.";
+                data.recommendation_message ||
+                t(
+                    "playMoreGames",
+                    "Play more games to receive a personalized recommendation."
+                );
 
         }
 
@@ -101,7 +335,7 @@ async function loadProgress() {
         if (aiAccuracy) {
 
             aiAccuracy.textContent =
-                `${data.average_accuracy}%`;
+                `${data.average_accuracy || 0}%`;
 
         }
 
@@ -109,7 +343,7 @@ async function loadProgress() {
         if (aiScore) {
 
             aiScore.textContent =
-                `${data.average_score}%`;
+                `${data.average_score || 0}%`;
 
         }
 
@@ -119,6 +353,7 @@ async function loadProgress() {
             const time =
                 data.average_time || 0;
 
+
             aiTime.textContent =
                 time > 0
                     ? `${time}s`
@@ -127,122 +362,126 @@ async function loadProgress() {
         }
 
 
-        // =================================================
-        // IF NO GAMES HAVE BEEN PLAYED
-        // =================================================
+        /* =============================================
+           NO GAMES
+           ============================================= */
 
-        if (!data.results || data.results.length === 0) {
+        if (
+            !data.results ||
+            data.results.length === 0
+        ) {
 
             list.innerHTML = `
 
                 <div class="loading">
 
-                    <h3>No games played yet</h3>
+                    <h3>
+                        ${t(
+                            "noGamesPlayed",
+                            "No games played yet"
+                        )}
+                    </h3>
 
                     <p>
-                        Play your first memory game and your
-                        progress will appear here.
+                        ${t(
+                            "noGamesPlayedText",
+                            "Play your first memory game and your progress will appear here."
+                        )}
                     </p>
 
                 </div>
 
             `;
 
+
             return;
 
         }
 
 
-        // =================================================
-        // DIFFICULTY HELPERS
-        // =================================================
+        /* =============================================
+           RECENT RESULTS
+           ============================================= */
 
-        function difficultyClass(difficulty) {
+        const recentResults =
+            data.results.map(result => `
 
-            if (difficulty === "easy") return "easy";
+                <article class="reminder-item">
 
-            if (difficulty === "medium") return "medium";
+                    <div>
 
-            if (difficulty === "hard") return "hard";
+                        <span
+                            class="difficulty-label
+                            ${difficultyClass(
+                                result.difficulty
+                            )}"
+                        >
 
-            return "";
+                            ${difficultyLabel(
+                                result.difficulty
+                            )}
 
-        }
-
-
-        function difficultyLabel(difficulty) {
-
-            if (!difficulty) return "Easy";
-
-            return difficulty.charAt(0).toUpperCase()
-                + difficulty.slice(1);
-
-        }
+                        </span>
 
 
-        // =================================================
-        // RECENT RESULTS
-        // =================================================
+                        <h3>
 
-        const recentResults = data.results.map(result => `
+                            ${result.game_name}
 
-            <article class="reminder-item">
-
-                <div>
-
-                    <span class="difficulty-label
-                        ${difficultyClass(result.difficulty)}">
-
-                        ${difficultyLabel(result.difficulty)}
-
-                    </span>
+                        </h3>
 
 
-                    <h3>
-                        ${result.game_name}
-                    </h3>
+                        <p>
+
+                            ${t("score", "Score")}:
+
+                            <strong>
+
+                                ${result.score}%
+
+                            </strong>
+
+                            &nbsp; • &nbsp;
+
+                            ${t("time", "Time")}:
+
+                            ${result.time_taken}s
+
+                        </p>
 
 
-                    <p>
+                        <small>
 
-                        Score:
-                        <strong>
-                            ${result.score}%
-                        </strong>
+                            ${result.played_at}
 
-                        &nbsp; • &nbsp;
+                        </small>
 
-                        Time:
-                        ${result.time_taken}s
-
-                    </p>
+                    </div>
 
 
-                    <small>
-                        ${result.played_at}
-                    </small>
+                    <div class="reminder-time">
 
-                </div>
+                        ${result.accuracy}%
 
+                        <small>
 
-                <div class="reminder-time">
+                            ${t(
+                                "accuracy",
+                                "accuracy"
+                            )}
 
-                    ${result.accuracy}%
+                        </small>
 
-                    <small>
-                        accuracy
-                    </small>
+                    </div>
 
-                </div>
+                </article>
 
-            </article>
-
-        `).join("");
+            `).join("");
 
 
-        // =================================================
-        // GAME PERFORMANCE
-        // =================================================
+        /* =============================================
+           GAME PERFORMANCE
+           ============================================= */
 
         const gamePerformance =
             (data.game_stats || []).map(game => `
@@ -252,11 +491,16 @@ async function loadProgress() {
                     <div class="progress-game-header">
 
                         <h3>
+
                             ${game.game_name}
+
                         </h3>
 
+
                         <span>
+
                             ${game.accuracy}%
+
                         </span>
 
                     </div>
@@ -276,7 +520,8 @@ async function loadProgress() {
                                         game.accuracy
                                     )
                                 )}%
-                            ">
+                            "
+                        >
                         </div>
 
                     </div>
@@ -285,18 +530,38 @@ async function loadProgress() {
                     <div class="progress-game-details">
 
                         <span>
-                            Played: ${game.played}
+
+                            ${t(
+                                "played",
+                                "Played"
+                            )}:
+
+                            ${game.played}
+
                         </span>
 
 
                         <span>
-                            Best: ${game.best_score}%
+
+                            ${t(
+                                "bestScore",
+                                "Best"
+                            )}:
+
+                            ${game.best_score}%
+
                         </span>
 
 
                         <span>
-                            Avg time:
+
+                            ${t(
+                                "averageTime",
+                                "Avg time"
+                            )}:
+
                             ${game.average_time}s
+
                         </span>
 
                     </div>
@@ -306,9 +571,9 @@ async function loadProgress() {
             `).join("");
 
 
-        // =================================================
-        // DIFFICULTY PERFORMANCE
-        // =================================================
+        /* =============================================
+           DIFFICULTY PERFORMANCE
+           ============================================= */
 
         const difficultyPerformance =
             (data.difficulty_stats || []).map(level => `
@@ -317,10 +582,16 @@ async function loadProgress() {
 
                     <div>
 
-                        <span class="difficulty-label
-                            ${difficultyClass(level.difficulty)}">
+                        <span
+                            class="difficulty-label
+                            ${difficultyClass(
+                                level.difficulty
+                            )}"
+                        >
 
-                            ${difficultyLabel(level.difficulty)}
+                            ${difficultyLabel(
+                                level.difficulty
+                            )}
 
                         </span>
 
@@ -328,7 +599,13 @@ async function loadProgress() {
                         <p>
 
                             ${level.played}
-                            game${level.played === 1 ? "" : "s"}
+
+                            ${t(
+                                "games",
+                                level.played === 1
+                                    ? "game"
+                                    : "games"
+                            )}
 
                         </p>
 
@@ -346,9 +623,9 @@ async function loadProgress() {
             `).join("");
 
 
-        // =================================================
-        // MAIN PROGRESS PAGE
-        // =================================================
+        /* =============================================
+           MAIN PROGRESS CONTENT
+           ============================================= */
 
         list.innerHTML = `
 
@@ -358,7 +635,12 @@ async function loadProgress() {
             <section class="progress-section">
 
                 <h2>
-                    Overall Progress
+
+                    ${t(
+                        "overallProgress",
+                        "Overall Progress"
+                    )}
+
                 </h2>
 
 
@@ -368,17 +650,28 @@ async function loadProgress() {
                     <div class="progress-stat-card">
 
                         <span class="progress-stat-icon">
+
                             🎮
+
                         </span>
+
 
                         <div>
 
                             <p>
-                                Games Played
+
+                                ${t(
+                                    "gamesPlayed",
+                                    "Games Played"
+                                )}
+
                             </p>
 
+
                             <strong>
+
                                 ${data.games_played}
+
                             </strong>
 
                         </div>
@@ -389,17 +682,28 @@ async function loadProgress() {
                     <div class="progress-stat-card">
 
                         <span class="progress-stat-icon">
+
                             🎯
+
                         </span>
+
 
                         <div>
 
                             <p>
-                                Average Accuracy
+
+                                ${t(
+                                    "averageAccuracy",
+                                    "Average Accuracy"
+                                )}
+
                             </p>
 
+
                             <strong>
+
                                 ${data.average_accuracy}%
+
                             </strong>
 
                         </div>
@@ -410,17 +714,28 @@ async function loadProgress() {
                     <div class="progress-stat-card">
 
                         <span class="progress-stat-icon">
+
                             🏆
+
                         </span>
+
 
                         <div>
 
                             <p>
-                                Best Score
+
+                                ${t(
+                                    "bestScore",
+                                    "Best Score"
+                                )}
+
                             </p>
 
+
                             <strong>
+
                                 ${data.best_score}%
+
                             </strong>
 
                         </div>
@@ -431,17 +746,28 @@ async function loadProgress() {
                     <div class="progress-stat-card">
 
                         <span class="progress-stat-icon">
+
                             📊
+
                         </span>
+
 
                         <div>
 
                             <p>
-                                Average Score
+
+                                ${t(
+                                    "averageScore",
+                                    "Average Score"
+                                )}
+
                             </p>
 
+
                             <strong>
+
                                 ${data.average_score}%
+
                             </strong>
 
                         </div>
@@ -461,19 +787,25 @@ async function loadProgress() {
                 <div class="recommendation-card">
 
                     <div class="recommendation-icon">
+
                         🤖
+
                     </div>
 
 
                     <div>
 
                         <h2>
+
                             ${data.recommendation}
+
                         </h2>
 
 
                         <p>
+
                             ${data.recommendation_message}
+
                         </p>
 
                     </div>
@@ -492,21 +824,9 @@ async function loadProgress() {
 
                     <div class="trend-icon">
 
-                        ${
-                            data.trend === "improving"
-
-                                ? "📈"
-
-                                : data.trend === "needs_practice"
-
-                                ? "💪"
-
-                                : data.trend === "starting"
-
-                                ? "🌱"
-
-                                : "➡️"
-                        }
+                        ${getTrendIcon(
+                            data.trend
+                        )}
 
                     </div>
 
@@ -515,27 +835,17 @@ async function loadProgress() {
 
                         <h2>
 
-                            ${
-                                data.trend === "improving"
-
-                                    ? "You're improving!"
-
-                                    : data.trend === "needs_practice"
-
-                                    ? "Keep practicing"
-
-                                    : data.trend === "starting"
-
-                                    ? "Great start!"
-
-                                    : "Keep going!"
-                            }
+                            ${getTrendTitle(
+                                data.trend
+                            )}
 
                         </h2>
 
 
                         <p>
+
                             ${data.trend_message}
+
                         </p>
 
                     </div>
@@ -550,7 +860,12 @@ async function loadProgress() {
             <section class="progress-section">
 
                 <h2>
-                    Performance by Game
+
+                    ${t(
+                        "performanceByGame",
+                        "Performance by Game"
+                    )}
+
                 </h2>
 
 
@@ -568,7 +883,12 @@ async function loadProgress() {
             <section class="progress-section">
 
                 <h2>
-                    Performance by Difficulty
+
+                    ${t(
+                        "performanceByDifficulty",
+                        "Performance by Difficulty"
+                    )}
+
                 </h2>
 
 
@@ -586,7 +906,12 @@ async function loadProgress() {
             <section class="progress-section">
 
                 <h2>
-                    Recent Games
+
+                    ${t(
+                        "recentGames",
+                        "Recent Games"
+                    )}
+
                 </h2>
 
 
@@ -601,7 +926,8 @@ async function loadProgress() {
         `;
 
 
-    } catch (error) {
+    }
+    catch (error) {
 
         console.error(
             "Progress loading error:",
@@ -609,33 +935,66 @@ async function loadProgress() {
         );
 
 
-        if (list) {
+        list.innerHTML = `
 
-            list.innerHTML = `
+            <div class="loading">
 
-                <div class="loading">
+                <h3>
 
-                    <h3>
-                        Unable to load progress
-                    </h3>
+                    ${t(
+                        "unableToLoadProgress",
+                        "Unable to load progress"
+                    )}
 
-                    <p>
-                        Please refresh the page and try again.
-                    </p>
+                </h3>
 
-                </div>
+                <p>
 
-            `;
+                    ${t(
+                        "refreshAndTry",
+                        "Please refresh the page and try again."
+                    )}
 
-        }
+                </p>
+
+            </div>
+
+        `;
 
     }
 
 }
 
 
-// =================================================
-// LOAD PROGRESS
-// =================================================
+/* =========================================================
+   LOAD WHEN PAGE OPENS
+   ========================================================= */
 
-loadProgress();
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    () => {
+
+        loadProgress();
+
+    }
+
+);
+
+
+/* =========================================================
+   RELOAD WHEN LANGUAGE CHANGES
+   ========================================================= */
+
+document.addEventListener(
+
+    "mindspaceLanguageChanged",
+
+    () => {
+
+        loadProgress();
+
+    }
+
+);

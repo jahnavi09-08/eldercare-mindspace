@@ -2438,3 +2438,78 @@ textarea {
     }
 
 }
+/* ==========================================
+   LANGUAGE SELECTOR - MODERN DESIGN
+========================================== */
+
+.language-selector {
+
+    appearance: none;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding: 10px 42px 10px 16px;
+
+    border-radius: 12px;
+
+    border: 2px solid #d7e9e0;
+
+    background-color: #ffffff;
+
+    color: #245c4f;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    outline: none;
+
+    min-width: 145px;
+
+    transition: all 0.25s ease;
+
+    box-shadow: 0 4px 12px rgba(36, 92, 79, 0.08);
+
+}
+
+
+/* Hover */
+
+.language-selector:hover {
+
+    border-color: #5fa98d;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 16px rgba(36, 92, 79, 0.15);
+
+}
+
+
+/* When clicked */
+
+.language-selector:focus {
+
+    border-color: #3d8b70;
+
+    box-shadow: 0 0 0 4px rgba(95, 169, 141, 0.18);
+
+}
+
+
+/* Dropdown options */
+
+.language-selector option {
+
+    background: white;
+
+    color: #245c4f;
+
+    font-size: 15px;
+
+    padding: 10px;
+
+}

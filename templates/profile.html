@@ -1,385 +1,220 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Profile | ElderCare MindSpace</title>
+{% extends "base.html" %}
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+{% block title %}Profile | MindSpace{% endblock %}
 
-    <style>
-        .profile-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-        }
+{% block content %}
 
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-            margin-bottom: 28px;
-        }
+<section class="page-header">
 
-        .profile-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: #e8f3ec;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            flex-shrink: 0;
-        }
+    <p class="eyebrow" data-translate="profile">
+        PROFILE
+    </p>
 
-        .profile-header h1 {
-            margin: 0 0 6px;
-        }
+    <h1 data-translate="myProfile">
+        👤 My Profile
+    </h1>
 
-        .profile-header p {
-            margin: 0;
-            font-size: 18px;
-        }
+    <p data-translate="profileIntro">
+        Your personal information and memory activity summary.
+    </p>
 
-        .profile-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
+</section>
 
-        .info-box {
-            background: #f7faf8;
-            border-radius: 14px;
-            padding: 18px;
-        }
 
-        .info-box span {
-            display: block;
-            font-size: 15px;
-            margin-bottom: 6px;
-            opacity: 0.75;
-        }
+<!-- ============================= -->
+<!-- PROFILE INFORMATION -->
+<!-- ============================= -->
 
-        .info-box strong {
-            font-size: 21px;
-        }
+<section class="profile-card">
 
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
+    <div class="profile-header">
 
-        .profile-stat {
-            background: #f7faf8;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-        }
+        <div class="profile-avatar">
+            👴
+        </div>
 
-        .profile-stat .icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
-        }
+        <div>
 
-        .profile-stat strong {
-            display: block;
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
+            <h1 id="userName">
+                {{ user.name }}
+            </h1>
 
-        .profile-stat span {
-            font-size: 15px;
-        }
+            <p id="userAge">
+                {{ user.age }} years old
+            </p>
 
-        .recommendation-box {
-            background: #f1f8f4;
-            border-left: 5px solid #4f8f68;
-            border-radius: 14px;
-            padding: 22px;
-        }
-
-        .recommendation-box h2 {
-            margin-top: 0;
-        }
-
-        .recommendation-box p {
-            font-size: 17px;
-            line-height: 1.6;
-        }
-
-        .profile-message {
-            background: #fff8e8;
-            border-radius: 14px;
-            padding: 20px;
-            font-size: 17px;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 800px) {
-            .profile-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .profile-info {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<header class="site-header">
-
-    <div class="container header-inner">
-
-        <a href="{{ url_for('home') }}" class="logo">
-            🌿 ElderCare MindSpace
-        </a>
-
-        <nav class="main-nav">
-
-            <a href="{{ url_for('home') }}">
-                Home
-            </a>
-
-            <a href="{{ url_for('games') }}">
-                Games
-            </a>
-
-            <a href="{{ url_for('reminders') }}">
-                Reminders
-            </a>
-
-            <a href="{{ url_for('progress') }}">
-                Progress
-            </a>
-
-            <a href="{{ url_for('activities') }}">
-                Activities
-            </a>
-
-            <a
-                href="{{ url_for('profile') }}"
-                class="active"
-            >
-                Profile
-            </a>
-
-        </nav>
+        </div>
 
     </div>
 
-</header>
 
+    <div class="profile-info">
 
-<main class="container">
+        <div class="info-box">
 
-    <section class="page-header">
+            <span data-translate="dailySupport">
+                🌿 Daily Support
+            </span>
 
-        <h1>👤 My Profile</h1>
-
-        <p>
-            Your personal information and memory activity summary.
-        </p>
-
-    </section>
-
-
-    <!-- PROFILE -->
-    <section class="profile-card">
-
-        <div class="profile-header">
-
-            <div class="profile-avatar">
-                👴
-            </div>
-
-            <div>
-
-                <h1 id="userName">
-                    {{ user.name }}
-                </h1>
-
-                <p id="userAge">
-                    {{ user.age }} years old    
-                </p>
-
-            </div>
+            <strong data-translate="mindMemory">
+                Mind & Memory
+            </strong>
 
         </div>
 
 
-        <div class="profile-info">
+        <div class="info-box">
 
-            <div class="info-box">
+            <span data-translate="recommendedLevel">
+                🎯 Recommended Level
+            </span>
 
-                <span>🌿 Daily Support</span>
-
-                <strong>
-                    Mind & Memory
-                </strong>
-
-            </div>
-
-            <div class="info-box">
-
-                <span>🎯 Recommended Level</span>
-
-                <strong id="recommendedDifficulty">
-                    Easy
-                </strong>
-
-            </div>
+            <strong id="recommendedDifficulty">
+                Easy
+            </strong>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- STATISTICS -->
-    <section class="profile-card">
+<!-- ============================= -->
+<!-- MEMORY STATISTICS -->
+<!-- ============================= -->
 
-        <h2>Your Memory Activity</h2>
+<section class="profile-card">
 
-        <div class="profile-stats">
-
-            <div class="profile-stat">
-
-                <span class="icon">🎮</span>
-
-                <strong id="gamesPlayed">
-                    0
-                </strong>
-
-                <span>
-                    Games Played
-                </span>
-
-            </div>
+    <h2 data-translate="memoryActivity">
+        Your Memory Activity
+    </h2>
 
 
-            <div class="profile-stat">
-
-                <span class="icon">🎯</span>
-
-                <strong id="averageAccuracy">
-                    0%
-                </strong>
-
-                <span>
-                    Average Accuracy
-                </span>
-
-            </div>
+    <div class="profile-stats">
 
 
-            <div class="profile-stat">
+        <div class="profile-stat">
 
-                <span class="icon">🏆</span>
+            <span class="icon">🎮</span>
 
-                <strong id="bestScore">
-                    0%
-                </strong>
+            <strong id="gamesPlayed">
+                0
+            </strong>
 
-                <span>
-                    Best Score
-                </span>
-
-            </div>
-
-
-            <div class="profile-stat">
-
-                <span class="icon">📊</span>
-
-                <strong id="averageScore">
-                    0%
-                </strong>
-
-                <span>
-                    Average Score
-                </span>
-
-            </div>
+            <span data-translate="gamesPlayed">
+                Games Played
+            </span>
 
         </div>
 
-    </section>
+
+        <div class="profile-stat">
+
+            <span class="icon">🎯</span>
+
+            <strong id="averageAccuracy">
+                0%
+            </strong>
+
+            <span data-translate="averageAccuracy">
+                Average Accuracy
+            </span>
+
+        </div>
 
 
-    <!-- RECOMMENDATION -->
-    <section class="profile-card">
+        <div class="profile-stat">
 
-        <div class="recommendation-box">
+            <span class="icon">🏆</span>
+
+            <strong id="bestScore">
+                0%
+            </strong>
+
+            <span data-translate="bestScore">
+                Best Score
+            </span>
+
+        </div>
+
+
+        <div class="profile-stat">
+
+            <span class="icon">📊</span>
+
+            <strong id="averageScore">
+                0%
+            </strong>
+
+            <span data-translate="averageScore">
+                Average Score
+            </span>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ============================= -->
+<!-- AI RECOMMENDATION -->
+<!-- ============================= -->
+
+<section class="profile-card">
+
+    <div class="recommendation-box">
+
+        <div class="recommendation-icon">
+            🤖
+        </div>
+
+        <div>
 
             <h2 id="recommendation">
                 Keep practicing
             </h2>
 
             <p id="recommendationMessage">
-                Your personalized recommendation will appear here
-                after you play some games.
+                Your personalized recommendation will appear here after you play some games.
             </p>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- ENCOURAGEMENT -->
-    <section class="profile-card">
+<!-- ============================= -->
+<!-- ENCOURAGEMENT -->
+<!-- ============================= -->
 
-        <div class="profile-message">
+<section class="profile-card">
 
-            💚 <strong>Keep going!</strong>
+    <div class="profile-message">
 
-            <br><br>
+        <h3 data-translate="encouragement">
+            💚 Keep going!
+        </h3>
 
+        <p data-translate="encouragementText">
             Every small activity matters. Playing memory games,
             following daily routines, and staying active can make
             each day more meaningful.
-
-        </div>
-
-    </section>
-
-</main>
-
-
-<footer class="site-footer">
-
-    <div class="container">
-
-        <p>
-            ElderCare MindSpace • Supporting healthy minds
-            through simple daily activities.
         </p>
 
     </div>
 
-</footer>
+</section>
 
+{% endblock %}
+
+
+{% block scripts %}
 
 <script>
 
@@ -390,31 +225,55 @@ async function loadProfile() {
         const response =
             await fetch("/api/progress");
 
+
         if (!response.ok) {
-            throw new Error("Could not load profile data");
+
+            throw new Error(
+                "Could not load profile data"
+            );
+
         }
+
 
         const data =
             await response.json();
 
 
-        // Statistics
-        document.getElementById("gamesPlayed")
-            .textContent = data.games_played;
+        // =============================================
+        // PROFILE STATISTICS
+        // =============================================
 
-        document.getElementById("averageAccuracy")
-            .textContent = `${data.average_accuracy}%`;
-
-        document.getElementById("bestScore")
-            .textContent = `${data.best_score}%`;
-
-        document.getElementById("averageScore")
-            .textContent = `${data.average_score}%`;
+        document.getElementById(
+            "gamesPlayed"
+        ).textContent =
+            data.games_played || 0;
 
 
-        // Difficulty
+        document.getElementById(
+            "averageAccuracy"
+        ).textContent =
+            `${data.average_accuracy || 0}%`;
+
+
+        document.getElementById(
+            "bestScore"
+        ).textContent =
+            `${data.best_score || 0}%`;
+
+
+        document.getElementById(
+            "averageScore"
+        ).textContent =
+            `${data.average_score || 0}%`;
+
+
+        // =============================================
+        // RECOMMENDED DIFFICULTY
+        // =============================================
+
         const difficulty =
             data.recommended_difficulty || "easy";
+
 
         document.getElementById(
             "recommendedDifficulty"
@@ -423,7 +282,10 @@ async function loadProfile() {
             + difficulty.slice(1);
 
 
-        // Recommendation
+        // =============================================
+        // AI RECOMMENDATION
+        // =============================================
+
         document.getElementById(
             "recommendation"
         ).textContent =
@@ -435,7 +297,7 @@ async function loadProfile() {
             "recommendationMessage"
         ).textContent =
             data.recommendation_message ||
-            "Keep practicing regularly.";
+            "Your personalized recommendation will appear here after you play some games.";
 
 
     } catch (error) {
@@ -454,5 +316,4 @@ loadProfile();
 
 </script>
 
-</body>
-</html>
+{% endblock %}

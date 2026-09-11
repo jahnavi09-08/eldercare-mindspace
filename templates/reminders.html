@@ -3,15 +3,17 @@
 {% block content %}
 
 <style>
+
     /* =========================================
        REMINDERS PAGE
-       ========================================= */
+    ========================================= */
 
     .reminders-page {
         max-width: 1100px;
         margin: 0 auto;
         padding-bottom: 50px;
     }
+
 
     /* ---------- HEADER ---------- */
 
@@ -36,7 +38,7 @@
 
     /* =========================================
        REMINDER CARDS
-       ========================================= */
+    ========================================= */
 
     #reminderList {
         margin-bottom: 35px;
@@ -95,12 +97,7 @@
 
     /* =========================================
        MARK DONE BUTTON
-       ========================================= */
-
-    /*
-       This works with the .complete-btn class
-       created by reminders.js.
-    */
+    ========================================= */
 
     .complete-btn {
         flex-shrink: 0;
@@ -137,9 +134,6 @@
             box-shadow 0.2s ease;
     }
 
-
-    /* Hover */
-
     .complete-btn:hover {
         background: #4d765d;
         color: #ffffff;
@@ -150,16 +144,10 @@
         box-shadow: 0 6px 14px rgba(77, 118, 93, 0.22);
     }
 
-
-    /* Click */
-
     .complete-btn:active {
         transform: translateY(0);
         box-shadow: 0 2px 5px rgba(77, 118, 93, 0.15);
     }
-
-
-    /* Keyboard accessibility */
 
     .complete-btn:focus-visible {
         outline: 3px solid rgba(77, 118, 93, 0.30);
@@ -167,9 +155,7 @@
     }
 
 
-    /* =========================================
-       COMPLETED STATE
-       ========================================= */
+    /* COMPLETED STATE */
 
     .complete-btn.completed {
         background: #e8f0e9;
@@ -192,7 +178,7 @@
 
     /* =========================================
        EMPTY STATE
-       ========================================= */
+    ========================================= */
 
     .empty-reminders {
         background: #ffffff;
@@ -210,7 +196,7 @@
 
     /* =========================================
        ADD REMINDER CARD
-       ========================================= */
+    ========================================= */
 
     .add-reminder-card {
         background: #ffffff;
@@ -240,7 +226,7 @@
 
     /* =========================================
        FORM
-       ========================================= */
+    ========================================= */
 
     .reminder-form {
         display: grid;
@@ -316,7 +302,7 @@
 
     /* =========================================
        ADD REMINDER BUTTON
-       ========================================= */
+    ========================================= */
 
     .reminder-submit-area {
         grid-column: 1 / -1;
@@ -370,15 +356,10 @@
         transform: translateY(0);
     }
 
-    .add-reminder-btn:focus-visible {
-        outline: 3px solid rgba(77, 118, 93, 0.30);
-        outline-offset: 3px;
-    }
-
 
     /* =========================================
        SUCCESS MESSAGE
-       ========================================= */
+    ========================================= */
 
     .reminder-success {
         margin-top: 15px;
@@ -399,7 +380,7 @@
 
     /* =========================================
        MOBILE
-       ========================================= */
+    ========================================= */
 
     @media (max-width: 750px) {
 
@@ -441,76 +422,53 @@
         }
     }
 
-
-    /* =========================================
-       SMALL MOBILE
-       ========================================= */
-
-    @media (max-width: 450px) {
-
-        .reminders-header h1 {
-            font-size: 27px;
-        }
-
-        .reminders-header p {
-            font-size: 16px;
-        }
-
-        .reminder-card {
-            padding: 18px;
-        }
-
-        .reminder-info h3 {
-            font-size: 19px;
-        }
-
-        .complete-btn {
-            min-height: 50px;
-            font-size: 16px;
-        }
-    }
 </style>
 
 
 <div class="reminders-page">
 
-    <!-- =====================================
-         PAGE HEADER
-         ===================================== -->
+
+    <!-- PAGE HEADER -->
 
     <div class="reminders-header">
 
-        <h1>Today's Reminders ⏰</h1>
+        <h1 data-translate="todaysReminders">
+            Today's Reminders ⏰
+        </h1>
 
-        <p>
+        <p data-translate="remindersIntro">
             Stay on track with your daily routine
         </p>
 
     </div>
 
 
-    <!-- =====================================
-         REMINDER LIST
-         ===================================== -->
+    <!-- REMINDER LIST -->
 
     <div id="reminderList">
 
-        <div class="empty-reminders">
+        <div
+            class="empty-reminders"
+            data-translate="loadingReminders"
+        >
             Loading reminders...
         </div>
 
     </div>
 
 
-    <!-- =====================================
-         ADD REMINDER
-         ===================================== -->
+    <!-- ADD REMINDER -->
 
     <section class="add-reminder-card">
 
-        <h2>➕ Add a Reminder</h2>
+        <h2 data-translate="addReminder">
+            ➕ Add a Reminder
+        </h2>
 
-        <p class="form-subtitle">
+        <p
+            class="form-subtitle"
+            data-translate="reminderIntro"
+        >
             Create a reminder for medicines, activities,
             meals, appointments, or daily routines.
         </p>
@@ -521,18 +479,23 @@
             class="reminder-form"
         >
 
+
             <!-- Reminder Title -->
 
             <div class="form-group">
 
-                <label for="reminderTitle">
+                <label
+                    for="reminderTitle"
+                    data-translate="reminderTitle"
+                >
                     Reminder Title
                 </label>
 
                 <input
                     type="text"
                     id="reminderTitle"
-                    placeholder="Example: Take morning medicine"
+                    data-placeholder="reminderTitle"
+                    placeholder="Reminder Title"
                     required
                 >
 
@@ -543,7 +506,10 @@
 
             <div class="form-group">
 
-                <label for="reminderTime">
+                <label
+                    for="reminderTime"
+                    data-translate="reminderTime"
+                >
                     Reminder Time
                 </label>
 
@@ -560,7 +526,10 @@
 
             <div class="form-group">
 
-                <label for="reminderType">
+                <label
+                    for="reminderType"
+                    data-translate="reminderType"
+                >
                     Reminder Type
                 </label>
 
@@ -569,19 +538,31 @@
                     required
                 >
 
-                    <option value="Health">
+                    <option
+                        value="Health"
+                        data-translate="health"
+                    >
                         💊 Health
                     </option>
 
-                    <option value="Activity">
+                    <option
+                        value="Activity"
+                        data-translate="reminderActivity"
+                    >
                         🚶 Activity
                     </option>
 
-                    <option value="Wellness">
+                    <option
+                        value="Wellness"
+                        data-translate="wellness"
+                    >
                         🌿 Wellness
                     </option>
 
-                    <option value="Brain">
+                    <option
+                        value="Brain"
+                        data-translate="brainExerciseOption"
+                    >
                         🧠 Brain Exercise
                     </option>
 
@@ -594,14 +575,18 @@
 
             <div class="form-group">
 
-                <label for="reminderDescription">
+                <label
+                    for="reminderDescription"
+                    data-translate="description"
+                >
                     Description
                 </label>
 
                 <input
                     type="text"
                     id="reminderDescription"
-                    placeholder="Example: Take after breakfast"
+                    data-placeholder="description"
+                    placeholder="Description"
                 >
 
             </div>
@@ -614,11 +599,13 @@
                 <button
                     type="submit"
                     class="add-reminder-btn"
+                    data-translate="addReminderButton"
                 >
-                    ✓&nbsp; Add Reminder
+                    ✓ Add Reminder
                 </button>
 
             </div>
+
 
         </form>
 
@@ -627,9 +614,7 @@
 </div>
 
 
-<!-- =========================================
-     REMINDERS JAVASCRIPT
-     ========================================= -->
+<!-- REMINDERS JAVASCRIPT -->
 
 <script src="{{ url_for('static', filename='js/reminders.js') }}"></script>
 

@@ -5,30 +5,25 @@
 
 {% block content %}
 
-<!-- =========================================
-     PAGE HEADER
-========================================= -->
-
 <section class="page-header">
 
-    <p class="eyebrow">
+    <p
+        class="eyebrow"
+        data-translate="brainExercise"
+    >
         BRAIN EXERCISE
     </p>
 
-    <h1>
+    <h1 data-translate="chooseGame">
         Choose a game 🧠
     </h1>
 
-    <p>
+    <p data-translate="takeYourTime">
         Take your time. There is no need to rush.
     </p>
 
 </section>
 
-
-<!-- =========================================
-     AI RECOMMENDATION
-========================================= -->
 
 <section class="games-ai-section">
 
@@ -41,15 +36,21 @@
 
         <div class="games-ai-content">
 
-            <p class="games-ai-label">
+            <p
+                class="games-ai-label"
+                data-translate="aiAdaptiveGaming"
+            >
                 AI ADAPTIVE GAMING
             </p>
 
-            <h2>
+            <h2 data-translate="personalizedRecommendation">
                 Your Personalized Recommendation
             </h2>
 
-            <p id="gamesAiMessage">
+            <p
+                id="gamesAiMessage"
+                data-translate="analyzingPerformance"
+            >
                 MindSpace is analyzing your recent performance...
             </p>
 
@@ -58,13 +59,14 @@
 
         <div class="games-ai-result">
 
-            <span>
+            <span data-translate="recommended">
                 Recommended
             </span>
 
             <strong
                 id="gamesAiDifficulty"
                 class="games-ai-difficulty"
+                data-translate="loading"
             >
                 Loading...
             </strong>
@@ -76,144 +78,134 @@
 </section>
 
 
-<!-- =========================================
-     GAME GRID
-========================================= -->
-
 <section class="games-list">
 
     <div class="game-grid">
 
-
-        <!-- SEQUENCE MEMORY -->
 
         <a
             class="game-card"
             href="{{ url_for('game', game_name='sequence') }}"
         >
 
-            <span class="game-icon">
-                🔢
-            </span>
+            <span class="game-icon">🔢</span>
 
-            <h2>
+            <h2 data-translate="sequenceMemory">
                 Sequence Memory
             </h2>
 
-            <p>
+            <p data-translate="sequenceDescription">
                 Remember and repeat a sequence of blocks.
             </p>
 
-            <span class="difficulty-label">
+            <span
+                class="difficulty-label"
+                data-translate="difficultyLevels"
+            >
                 Easy · Medium · Hard
             </span>
 
         </a>
 
-
-        <!-- REMEMBER THE PICTURE -->
 
         <a
             class="game-card"
             href="{{ url_for('game', game_name='picture') }}"
         >
 
-            <span class="game-icon">
-                🖼️
-            </span>
+            <span class="game-icon">🖼️</span>
 
-            <h2>
+            <h2 data-translate="pictureMemory">
                 Remember the Picture
             </h2>
 
-            <p>
+            <p data-translate="pictureDescription">
                 Look carefully and remember what you saw.
             </p>
 
-            <span class="difficulty-label">
+            <span
+                class="difficulty-label"
+                data-translate="difficultyLevels"
+            >
                 Easy · Medium · Hard
             </span>
 
         </a>
 
-
-        <!-- OBJECT MATCHING -->
 
         <a
             class="game-card"
             href="{{ url_for('game', game_name='objects') }}"
         >
 
-            <span class="game-icon">
-                🧩
-            </span>
+            <span class="game-icon">🧩</span>
 
-            <h2>
+            <h2 data-translate="objectMatching">
                 Object Matching
             </h2>
 
-            <p>
+            <p data-translate="objectDescription">
                 Match everyday objects that naturally belong together.
             </p>
 
-            <span class="difficulty-label">
+            <span
+                class="difficulty-label"
+                data-translate="difficultyLevels"
+            >
                 Easy · Medium · Hard
             </span>
 
         </a>
 
-
-        <!-- DAILY ROUTINE -->
 
         <a
             class="game-card"
             href="{{ url_for('game', game_name='routine') }}"
         >
 
-            <span class="game-icon">
-                📅
-            </span>
+            <span class="game-icon">📅</span>
 
-            <h2>
+            <h2 data-translate="dailyRoutineRecall">
                 Daily Routine Recall
             </h2>
 
-            <p>
+            <p data-translate="routineDescription">
                 Remember simple events from a daily routine.
             </p>
 
-            <span class="difficulty-label">
+            <span
+                class="difficulty-label"
+                data-translate="difficultyLevels"
+            >
                 Easy · Medium · Hard
             </span>
 
         </a>
 
-
-        <!-- WORD RECALL -->
 
         <a
             class="game-card"
             href="{{ url_for('game', game_name='words') }}"
         >
 
-            <span class="game-icon">
-                🔤
-            </span>
+            <span class="game-icon">🔤</span>
 
-            <h2>
+            <h2 data-translate="wordRecall">
                 Word Recall
             </h2>
 
-            <p>
+            <p data-translate="wordDescription">
                 Remember a small group of familiar words.
             </p>
 
-            <span class="difficulty-label">
+            <span
+                class="difficulty-label"
+                data-translate="difficultyLevels"
+            >
                 Easy · Medium · Hard
             </span>
 
         </a>
-
 
     </div>
 

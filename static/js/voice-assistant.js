@@ -1,38 +1,386 @@
-// ============================================
-// MINDSPACE - AI VOICE ASSISTANT
-// ============================================
+// ============================================================
+// ELDERCARE MINDSPACE - SMART VOICE ASSISTANT
+// ============================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("Voice Assistant loading...");
-
-
-    // ============================================
-    // BROWSER SUPPORT
-    // ============================================
+    // ========================================================
+    // SPEECH RECOGNITION SUPPORT
+    // ========================================================
 
     const SpeechRecognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
 
-    // ============================================
+    if (!SpeechRecognition) {
+
+        console.error(
+            "Speech recognition is not supported."
+        );
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // LANGUAGE CONFIGURATION
+    // ========================================================
+
+    const LANGUAGE_CONFIG = {
+
+        en: {
+
+            recognition: "en-IN",
+
+            speech: "en-IN",
+
+            button: "Voice Assistant",
+
+            ready:
+                "Tap the microphone and speak.",
+
+            starting:
+                "Starting microphone...",
+
+            listening:
+                "Listening... Speak now.",
+
+            hearing:
+                "I can hear you.",
+
+            processing:
+                "Processing your voice...",
+
+            noSpeech:
+                "I could not hear anything. Please try again.",
+
+            microphoneDenied:
+                "Microphone permission denied.",
+
+            unknown:
+                "Sorry, I did not understand that.",
+
+            welcome:
+                "Hello! How can I help you? " +
+                "I can help you open Home, Games, Reminders, " +
+                "Activities, Progress, or Profile. " +
+                "Would you like me to explain the Home page?",
+
+            homeDescription:
+                "Welcome to MindSpace. " +
+                "This website helps support memory and daily wellbeing. " +
+                "You can use Games to play memory activities. " +
+                "Reminders helps you remember important tasks. " +
+                "Activities helps you plan your daily routine. " +
+                "Progress shows your game performance and AI recommendation. " +
+                "Profile shows your personal information and memory activity summary.",
+
+            openingHome:
+                "Opening the Home page.",
+
+            openingGames:
+                "Opening Games.",
+
+            openingReminders:
+                "Opening Reminders.",
+
+            openingActivities:
+                "Opening Activities.",
+
+            openingProgress:
+                "Opening Progress.",
+
+            openingProfile:
+                "Opening Profile.",
+
+            gamesDescription:
+                "Welcome to Games. " +
+                "You can play Sequence Memory, Remember the Picture, " +
+                "Object Matching, Daily Routine Recall, and Word Recall. " +
+                "Each game helps support memory and thinking skills.",
+
+            remindersDescription:
+                "Welcome to Reminders. " +
+                "Here you can add reminders for important daily tasks, " +
+                "medicines, wellness activities, and other routines.",
+
+            activitiesDescription:
+                "Welcome to Daily Activities. " +
+                "Here you can add simple daily activities such as walking, " +
+                "reading, gardening, exercise, or listening to music.",
+
+            profileDescription:
+                "Welcome to your Profile. " +
+                "Here you can see your personal information, " +
+                "memory activity statistics, recommended difficulty, " +
+                "and personalized recommendation.",
+
+            help:
+                "You can say open Home, open Games, open Reminders, " +
+                "open Activities, open Progress, or open Profile."
+        },
+
+
+        // ====================================================
+        // TELUGU
+        // ====================================================
+
+        te: {
+
+            recognition: "te-IN",
+
+            speech: "te-IN",
+
+            button: "వాయిస్ అసిస్టెంట్",
+
+            ready:
+                "మైక్రోఫోన్ నొక్కి మాట్లాడండి.",
+
+            starting:
+                "మైక్రోఫోన్ ప్రారంభమవుతోంది.",
+
+            listening:
+                "వింటున్నాను. ఇప్పుడు మాట్లాడండి.",
+
+            hearing:
+                "నేను మిమ్మల్ని వింటున్నాను.",
+
+            processing:
+                "మీ మాటలను అర్థం చేసుకుంటున్నాను.",
+
+            noSpeech:
+                "మీ మాటలు వినిపించలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.",
+
+            microphoneDenied:
+                "మైక్రోఫోన్ అనుమతి ఇవ్వబడలేదు.",
+
+            unknown:
+                "క్షమించండి, నేను అర్థం చేసుకోలేకపోయాను.",
+
+            welcome:
+                "నమస్కారం! నేను మీకు ఎలా సహాయం చేయగలను? " +
+                "నేను హోమ్, గేమ్స్, రిమైండర్స్, యాక్టివిటీస్, " +
+                "ప్రోగ్రెస్ లేదా ప్రొఫైల్ తెరవగలను. " +
+                "మీకు హోమ్ పేజీ గురించి వివరించాలా?",
+
+            homeDescription:
+                "మైండ్‌స్పేస్‌కు స్వాగతం. " +
+                "ఇక్కడ మీరు మెమరీ గేమ్స్ ఆడవచ్చు, " +
+                "రిమైండర్స్ సెట్ చేసుకోవచ్చు, " +
+                "రోజువారీ యాక్టివిటీస్ ప్లాన్ చేసుకోవచ్చు, " +
+                "మీ ప్రోగ్రెస్ చూడవచ్చు.",
+
+            openingHome:
+                "హోమ్ పేజీని తెరుస్తున్నాను.",
+
+            openingGames:
+                "గేమ్స్ తెరుస్తున్నాను.",
+
+            openingReminders:
+                "రిమైండర్స్ తెరుస్తున్నాను.",
+
+            openingActivities:
+                "యాక్టివిటీస్ తెరుస్తున్నాను.",
+
+            openingProgress:
+                "మీ ప్రోగ్రెస్ తెరుస్తున్నాను.",
+
+            openingProfile:
+                "మీ ప్రొఫైల్ తెరుస్తున్నాను.",
+
+            gamesDescription:
+                "గేమ్స్ పేజీకి స్వాగతం. ఇక్కడ మెమరీ గేమ్స్ ఉన్నాయి.",
+
+            remindersDescription:
+                "రిమైండర్స్ పేజీలో ముఖ్యమైన పనులకు గుర్తింపులు పెట్టుకోవచ్చు.",
+
+            activitiesDescription:
+                "యాక్టివిటీస్ పేజీలో రోజువారీ కార్యక్రమాలను ప్లాన్ చేసుకోవచ్చు.",
+
+            profileDescription:
+                "ప్రొఫైల్‌లో మీ వ్యక్తిగత సమాచారం మరియు ప్రోగ్రెస్ చూడవచ్చు.",
+
+            help:
+                "మీరు గేమ్స్ తెరవండి, ప్రోగ్రెస్ తెరవండి, " +
+                "యాక్టివిటీస్ తెరవండి లేదా హోమ్‌కు వెళ్ళండి అని చెప్పవచ్చు."
+        },
+
+
+        // ====================================================
+        // HINDI
+        // ====================================================
+
+        hi: {
+
+            recognition: "hi-IN",
+
+            speech: "hi-IN",
+
+            button: "वॉइस असिस्टेंट",
+
+            ready:
+                "माइक्रोफोन दबाकर बोलें।",
+
+            starting:
+                "माइक्रोफोन शुरू हो रहा है।",
+
+            listening:
+                "मैं सुन रहा हूँ। अब बोलिए।",
+
+            hearing:
+                "मैं आपको सुन रहा हूँ।",
+
+            processing:
+                "आपकी बात समझ रहा हूँ।",
+
+            noSpeech:
+                "मुझे कुछ सुनाई नहीं दिया। कृपया फिर से कोशिश करें।",
+
+            microphoneDenied:
+                "माइक्रोफोन की अनुमति नहीं मिली।",
+
+            unknown:
+                "माफ़ कीजिए, मैं समझ नहीं पाया।",
+
+            welcome:
+                "नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ? " +
+                "मैं होम, गेम्स, रिमाइंडर्स, एक्टिविटीज, " +
+                "प्रोग्रेस या प्रोफाइल खोल सकता हूँ। " +
+                "क्या आप चाहते हैं कि मैं होम पेज समझाऊँ?",
+
+            homeDescription:
+                "माइंडस्पेस में आपका स्वागत है। " +
+                "यहाँ आप मेमोरी गेम खेल सकते हैं, " +
+                "रिमाइंडर बना सकते हैं, " +
+                "दैनिक गतिविधियाँ प्लान कर सकते हैं " +
+                "और अपनी प्रगति देख सकते हैं।",
+
+            openingHome:
+                "होम पेज खोल रहा हूँ।",
+
+            openingGames:
+                "गेम्स खोल रहा हूँ।",
+
+            openingReminders:
+                "रिमाइंडर्स खोल रहा हूँ।",
+
+            openingActivities:
+                "एक्टिविटीज खोल रहा हूँ।",
+
+            openingProgress:
+                "आपकी प्रगति खोल रहा हूँ।",
+
+            openingProfile:
+                "आपकी प्रोफाइल खोल रहा हूँ।",
+
+            gamesDescription:
+                "गेम्स पेज पर कई मेमोरी गेम उपलब्ध हैं।",
+
+            remindersDescription:
+                "रिमाइंडर्स पेज पर आप महत्वपूर्ण कामों के लिए रिमाइंडर बना सकते हैं।",
+
+            activitiesDescription:
+                "एक्टिविटीज पेज पर आप अपनी दैनिक गतिविधियाँ प्लान कर सकते हैं।",
+
+            profileDescription:
+                "प्रोफाइल में आपकी व्यक्तिगत जानकारी और प्रगति दिखाई जाती है।",
+
+            help:
+                "आप कह सकते हैं गेम्स खोलो, प्रोग्रेस खोलो, एक्टिविटीज खोलो या होम खोलो।"
+        }
+
+    };
+
+
+    // ========================================================
+    // GET LANGUAGE
+    // ========================================================
+
+    function getCurrentLanguage() {
+
+        const selector =
+            document.getElementById("languageSelector");
+
+
+        if (
+            selector &&
+            LANGUAGE_CONFIG[selector.value]
+        ) {
+
+            return selector.value;
+
+        }
+
+
+        return "en";
+
+    }
+
+
+    function getLanguageConfig() {
+
+        return LANGUAGE_CONFIG[
+            getCurrentLanguage()
+        ];
+
+    }
+
+
+    // ========================================================
+    // SPEECH RECOGNITION
+    // ========================================================
+
+    const recognition =
+        new SpeechRecognition();
+
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    recognition.maxAlternatives = 1;
+
+
+    let isListening = false;
+
+
+    // ========================================================
+    // CONVERSATION STATE
+    // ========================================================
+
+    let waitingForHomeAnswer = false;
+
+
+    // ========================================================
     // CREATE VOICE ASSISTANT UI
-    // ============================================
+    // ========================================================
 
-    const assistant = document.createElement("div");
+    const assistant =
+        document.createElement("div");
 
-    assistant.id = "voiceAssistant";
+
+    assistant.id =
+        "voiceAssistant";
+
 
     assistant.innerHTML = `
+
         <button
             id="voiceAssistantButton"
             type="button"
             aria-label="Voice Assistant"
         >
+
             🎤
-            <span>Voice Assistant</span>
+
+            <span id="voiceAssistantButtonText">
+                Voice Assistant
+            </span>
+
         </button>
+
 
         <div
             id="voiceAssistantStatus"
@@ -40,801 +388,1005 @@ document.addEventListener("DOMContentLoaded", () => {
         >
             Tap the microphone and speak
         </div>
+
     `;
 
-    document.body.appendChild(assistant);
+
+    document.body.appendChild(
+        assistant
+    );
 
 
     const voiceButton =
-        document.getElementById("voiceAssistantButton");
+        document.getElementById(
+            "voiceAssistantButton"
+        );
+
+
+    const buttonText =
+        document.getElementById(
+            "voiceAssistantButtonText"
+        );
+
 
     const status =
-        document.getElementById("voiceAssistantStatus");
+        document.getElementById(
+            "voiceAssistantStatus"
+        );
 
 
-    // ============================================
-    // TEXT TO SPEECH
-    // ============================================
+    // ========================================================
+    // UPDATE LANGUAGE UI
+    // ========================================================
 
-    function speak(text) {
+    function updateVoiceUI() {
 
-        console.log("Assistant says:", text);
+        const lang =
+            getLanguageConfig();
 
-        if (!("speechSynthesis" in window)) {
 
-            console.error(
-                "Speech synthesis is not supported."
-            );
+        buttonText.textContent =
+            lang.button;
 
-            return;
+
+        if (!isListening) {
+
+            status.textContent =
+                lang.ready;
+
         }
 
+    }
 
-        // Stop previous speech
+
+    updateVoiceUI();
+
+
+    // ========================================================
+    // SPEAK
+    // ========================================================
+
+    function speak(text, callback = null) {
+
         window.speechSynthesis.cancel();
 
 
         const utterance =
-            new SpeechSynthesisUtterance(text);
+            new SpeechSynthesisUtterance(
+                text
+            );
 
 
-        utterance.lang = "en-IN";
+        utterance.lang =
+            getLanguageConfig().speech;
 
-        utterance.rate = 0.9;
+
+        utterance.rate = 0.85;
 
         utterance.pitch = 1;
 
 
-        utterance.onstart = () => {
+        if (callback) {
 
-            console.log(
-                "Assistant started speaking."
-            );
+            utterance.onend =
+                callback;
 
-        };
-
-
-        utterance.onend = () => {
-
-            console.log(
-                "Assistant finished speaking."
-            );
-
-        };
+        }
 
 
-        utterance.onerror = event => {
-
-            console.error(
-                "Speech synthesis error:",
-                event
-            );
-
-        };
-
-
-        // Important Chrome fix
-        window.speechSynthesis.resume();
-
-
-        setTimeout(() => {
-
-            window.speechSynthesis.speak(
-                utterance
-            );
-
-        }, 100);
+        window.speechSynthesis.speak(
+            utterance
+        );
 
     }
 
 
-    // ============================================
-    // CHECK SPEECH RECOGNITION
-    // ============================================
+    // ========================================================
+    // START LISTENING
+    // ========================================================
 
-    if (!SpeechRecognition) {
+    function startListening() {
 
-        console.error(
-            "Speech Recognition is not supported."
-        );
+        if (isListening) {
 
-        status.textContent =
-            "Voice recognition is not supported in this browser.";
+            return;
 
-        voiceButton.addEventListener(
-            "click",
-            () => {
-
-                speak(
-                    "Voice recognition is not supported. Please use Google Chrome."
-                );
-
-            }
-        );
-
-        return;
-    }
+        }
 
 
-    // ============================================
-    // CREATE RECOGNITION
-    // ============================================
-
-    const recognition =
-        new SpeechRecognition();
+        const lang =
+            getLanguageConfig();
 
 
-    recognition.lang = "en-US";
+        recognition.lang =
+            lang.recognition;
 
-    recognition.continuous = false;
-
-    recognition.interimResults = true;
-
-    recognition.maxAlternatives = 3;
-
-
-    let isListening = false;
-
-    let finalTranscript = "";
-
-
-    // ============================================
-    // MICROPHONE PERMISSION CHECK
-    // ============================================
-
-    async function requestMicrophone() {
 
         try {
 
-            console.log(
-                "Requesting microphone permission..."
-            );
-
-
-            const stream =
-                await navigator.mediaDevices.getUserMedia({
-                    audio: true
-                });
-
-
-            console.log(
-                "Microphone permission granted!"
-            );
-
-
-            // Stop stream because SpeechRecognition
-            // will use the microphone itself
-
-            stream.getTracks().forEach(track => {
-
-                track.stop();
-
-            });
-
-
-            return true;
+            recognition.start();
 
         }
         catch (error) {
 
             console.error(
-                "Microphone permission error:",
+                "Recognition error:",
                 error
             );
-
-
-            status.textContent =
-                "❌ Please allow microphone access.";
-
-            speak(
-                "Please allow microphone access in your browser."
-            );
-
-
-            return false;
 
         }
 
     }
 
 
-    // ============================================
-    // START LISTENING
-    // ============================================
+    // ========================================================
+    // BUTTON CLICK
+    // ========================================================
 
     voiceButton.addEventListener(
         "click",
-        async () => {
+        function () {
 
-            if (isListening) {
-
-                console.log(
-                    "Already listening."
-                );
-
-                return;
-
-            }
+            const lang =
+                getLanguageConfig();
 
 
-            // ----------------------------------------
-            // Check microphone permission
-            // ----------------------------------------
+            // Stop existing speech
+
+            window.speechSynthesis.cancel();
+
+
+            waitingForHomeAnswer = true;
+
 
             status.textContent =
-                "🎧 Checking microphone...";
+                "🤖 Assistant is ready";
 
 
-            const allowed =
-                await requestMicrophone();
+            // First conversation
 
+            speak(
+                lang.welcome,
+                function () {
 
-            if (!allowed) {
+                    startListening();
 
-                return;
-
-            }
-
-
-            // ----------------------------------------
-            // Start recognition
-            // ----------------------------------------
-
-            try {
-
-                finalTranscript = "";
-
-                console.log(
-                    "Starting speech recognition..."
-                );
-
-
-                status.textContent =
-                    "🎤 Listening... Speak now";
-
-
-                voiceButton.classList.add(
-                    "listening"
-                );
-
-
-                isListening = true;
-
-
-                recognition.start();
-
-            }
-            catch (error) {
-
-                console.error(
-                    "Recognition start error:",
-                    error
-                );
-
-
-                isListening = false;
-
-
-                voiceButton.classList.remove(
-                    "listening"
-                );
-
-
-                status.textContent =
-                    "❌ Could not start listening.";
-
-            }
+                }
+            );
 
         }
     );
 
 
-    // ============================================
-    // RECOGNITION STARTED
-    // ============================================
+    // ========================================================
+    // RECOGNITION START
+    // ========================================================
 
-    recognition.onstart = () => {
+    recognition.onstart =
+        function () {
 
-        console.log(
-            "Recognition started successfully!"
-        );
-
-
-        isListening = true;
+            isListening = true;
 
 
-        voiceButton.classList.add(
-            "listening"
-        );
+            voiceButton.classList.add(
+                "listening"
+            );
 
-
-        status.textContent =
-            "👂 I'm listening... speak now";
-
-    };
-
-
-    // ============================================
-    // SPEECH STARTED
-    // ============================================
-
-    recognition.onspeechstart = () => {
-
-        console.log(
-            "Speech detected!"
-        );
-
-
-        status.textContent =
-            "👂 I can hear you...";
-
-    };
-
-
-    // ============================================
-    // SOUND DETECTED
-    // ============================================
-
-    recognition.onsoundstart = () => {
-
-        console.log(
-            "Sound detected!"
-        );
-
-    };
-
-
-    // ============================================
-    // SPEECH ENDED
-    // ============================================
-
-    recognition.onspeechend = () => {
-
-        console.log(
-            "Speech ended."
-        );
-
-
-        status.textContent =
-            "🧠 Understanding your command...";
-
-    };
-
-
-    // ============================================
-    // PROCESS RESULTS
-    // ============================================
-
-    recognition.onresult = event => {
-
-        console.log(
-            "Speech result received:",
-            event
-        );
-
-
-        let transcript = "";
-
-
-        for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-        ) {
-
-            transcript +=
-                event.results[i][0].transcript;
-
-
-            if (
-                event.results[i].isFinal
-            ) {
-
-                finalTranscript +=
-                    event.results[i][0].transcript;
-
-            }
-
-        }
-
-
-        transcript =
-            transcript.trim();
-
-
-        console.log(
-            "Heard:",
-            transcript
-        );
-
-
-        // Show live speech
-
-        if (transcript) {
 
             status.textContent =
-                `You said: "${transcript}"`;
+                getLanguageConfig().listening;
 
-        }
+        };
 
 
-        // Process final speech
+    // ========================================================
+    // SPEECH START
+    // ========================================================
 
-        if (finalTranscript.trim()) {
+    recognition.onspeechstart =
+        function () {
 
-            const command =
-                finalTranscript
+            status.textContent =
+                getLanguageConfig().hearing;
+
+        };
+
+
+    // ========================================================
+    // SPEECH END
+    // ========================================================
+
+    recognition.onspeechend =
+        function () {
+
+            status.textContent =
+                getLanguageConfig().processing;
+
+        };
+
+
+    // ========================================================
+    // RESULT
+    // ========================================================
+
+    recognition.onresult =
+        function (event) {
+
+            const transcript =
+                event.results[0][0]
+                    .transcript
                     .toLowerCase()
                     .trim();
 
 
             console.log(
-                "Final command:",
-                command
+                "User said:",
+                transcript
             );
 
 
-            processCommand(command);
-
-        }
-
-    };
-
-
-    // ============================================
-    // RECOGNITION ENDED
-    // ============================================
-
-    recognition.onend = () => {
-
-        console.log(
-            "Recognition ended."
-        );
-
-
-        isListening = false;
-
-
-        voiceButton.classList.remove(
-            "listening"
-        );
-
-    };
-
-
-    // ============================================
-    // ERROR HANDLING
-    // ============================================
-
-    recognition.onerror = event => {
-
-        console.error(
-            "Recognition error:",
-            event.error
-        );
-
-
-        isListening = false;
-
-
-        voiceButton.classList.remove(
-            "listening"
-        );
-
-
-        // ----------------------------------------
-        // NO SPEECH
-        // ----------------------------------------
-
-        if (
-            event.error === "no-speech"
-        ) {
-
             status.textContent =
-                "🔇 I couldn't hear anything. Please try again.";
-
-            return;
-
-        }
+                "🎤 " +
+                event.results[0][0].transcript;
 
 
-        // ----------------------------------------
-        // MICROPHONE DENIED
-        // ----------------------------------------
-
-        if (
-            event.error === "not-allowed" ||
-            event.error === "service-not-allowed"
-        ) {
-
-            status.textContent =
-                "❌ Microphone permission was denied.";
-
-            speak(
-                "Please allow microphone access."
+            processCommand(
+                transcript
             );
 
-            return;
-
-        }
+        };
 
 
-        // ----------------------------------------
-        // AUDIO CAPTURE
-        // ----------------------------------------
+    // ========================================================
+    // END
+    // ========================================================
 
-        if (
-            event.error === "audio-capture"
-        ) {
+    recognition.onend =
+        function () {
 
-            status.textContent =
-                "❌ No microphone was found.";
+            isListening = false;
 
-            speak(
-                "I could not find a microphone."
+
+            voiceButton.classList.remove(
+                "listening"
             );
 
-            return;
-
-        }
+        };
 
 
-        // ----------------------------------------
-        // NETWORK
-        // ----------------------------------------
+    // ========================================================
+    // ERROR
+    // ========================================================
 
-        if (
-            event.error === "network"
-        ) {
+    recognition.onerror =
+        function (event) {
 
-            status.textContent =
-                "❌ Speech recognition needs an internet connection.";
-
-            return;
-
-        }
+            isListening = false;
 
 
-        // ----------------------------------------
-        // OTHER ERROR
-        // ----------------------------------------
-
-        status.textContent =
-            "❌ Voice error: " +
-            event.error;
-
-    };
+            voiceButton.classList.remove(
+                "listening"
+            );
 
 
-    // ============================================
+            const lang =
+                getLanguageConfig();
+
+
+            if (
+                event.error === "not-allowed"
+            ) {
+
+                status.textContent =
+                    lang.microphoneDenied;
+
+                speak(
+                    lang.microphoneDenied
+                );
+
+            }
+
+            else if (
+                event.error === "no-speech"
+            ) {
+
+                status.textContent =
+                    lang.noSpeech;
+
+            }
+
+            else {
+
+                status.textContent =
+                    "Voice recognition error.";
+
+            }
+
+        };
+
+
+    // ========================================================
+    // NAVIGATE AND READ
+    // ========================================================
+
+    function openPage(
+        url,
+        openingMessage,
+        pageToRead
+    ) {
+
+        // Save which page should be read
+
+        sessionStorage.setItem(
+            "voiceReadPage",
+            pageToRead
+        );
+
+
+        speak(
+            openingMessage
+        );
+
+
+        setTimeout(
+            function () {
+
+                window.location.href =
+                    url;
+
+            },
+            1400
+        );
+
+    }
+
+
+    // ========================================================
+    // YES / NO DETECTION
+    // ========================================================
+
+    function isYes(command) {
+
+        return (
+
+            command.includes("yes") ||
+            command.includes("yeah") ||
+            command.includes("sure") ||
+            command.includes("okay") ||
+            command.includes("yes please") ||
+
+            command.includes("అవును") ||
+            command.includes("చెప్పు") ||
+
+            command.includes("हाँ") ||
+            command.includes("हां")
+
+        );
+
+    }
+
+
+    function isNo(command) {
+
+        return (
+
+            command.includes("no") ||
+            command.includes("no thanks") ||
+
+            command.includes("వద్దు") ||
+            command.includes("లేదు") ||
+
+            command.includes("नहीं")
+
+        );
+
+    }
+
+
+    // ========================================================
     // COMMAND PROCESSOR
-    // ============================================
+    // ========================================================
 
     function processCommand(command) {
 
-        console.log(
-            "Processing command:",
-            command
+        const lang =
+            getLanguageConfig();
+
+
+        // ====================================================
+        // YES / NO FOR HOME QUESTION
+        // ====================================================
+
+        if (waitingForHomeAnswer) {
+
+            if (isYes(command)) {
+
+                waitingForHomeAnswer = false;
+
+
+                speak(
+                    lang.homeDescription
+                );
+
+
+                return;
+
+            }
+
+
+            if (isNo(command)) {
+
+                waitingForHomeAnswer = false;
+
+
+                speak(
+                    lang.help
+                );
+
+
+                return;
+
+            }
+
+
+            // User may directly say:
+            // Open Progress
+            // Open Activities
+
+            waitingForHomeAnswer = false;
+
+        }
+
+
+        // ====================================================
+        // PROGRESS
+        // ====================================================
+
+        if (
+
+            command.includes("progress") ||
+            command.includes("performance") ||
+            command.includes("my results") ||
+
+            command.includes("ప్రోగ్రెస్") ||
+            command.includes("పురోగతి") ||
+
+            command.includes("प्रगति") ||
+            command.includes("प्रोग्रेस")
+
+        ) {
+
+            openPage(
+                "/progress",
+                lang.openingProgress,
+                "progress"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // ACTIVITIES
+        // ====================================================
+
+        if (
+
+            command.includes("activity") ||
+            command.includes("activities") ||
+
+            command.includes("యాక్టివిటీస్") ||
+            command.includes("కార్యకలాపాలు") ||
+
+            command.includes("गतिविधि") ||
+            command.includes("एक्टिविटी")
+
+        ) {
+
+            openPage(
+                "/activities",
+                lang.openingActivities,
+                "activities"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // GAMES
+        // ====================================================
+
+        if (
+
+            command.includes("game") ||
+            command.includes("games") ||
+
+            command.includes("గేమ్") ||
+            command.includes("గేమ్స్") ||
+
+            command.includes("गेम") ||
+            command.includes("खेल")
+
+        ) {
+
+            openPage(
+                "/games",
+                lang.openingGames,
+                "games"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // REMINDERS
+        // ====================================================
+
+        if (
+
+            command.includes("reminder") ||
+
+            command.includes("రిమైండర్") ||
+
+            command.includes("रिमाइंडर")
+
+        ) {
+
+            openPage(
+                "/reminders",
+                lang.openingReminders,
+                "reminders"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // PROFILE
+        // ====================================================
+
+        if (
+
+            command.includes("profile") ||
+
+            command.includes("ప్రొఫైల్") ||
+
+            command.includes("प्रोफाइल")
+
+        ) {
+
+            openPage(
+                "/profile",
+                lang.openingProfile,
+                "profile"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // HOME
+        // ====================================================
+
+        if (
+
+            command.includes("home") ||
+            command.includes("main page") ||
+
+            command.includes("హోమ్") ||
+
+            command.includes("होम")
+
+        ) {
+
+            openPage(
+                "/",
+                lang.openingHome,
+                "home"
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // HELP
+        // ====================================================
+
+        if (
+
+            command.includes("help") ||
+            command.includes("what can you do") ||
+
+            command.includes("సహాయం") ||
+
+            command.includes("मदद")
+
+        ) {
+
+            speak(
+                lang.help
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // UNKNOWN
+        // ====================================================
+
+        speak(
+            lang.unknown
+        );
+
+    }
+
+
+    // ========================================================
+    // READ CURRENT PAGE
+    // ========================================================
+
+    async function readCurrentPage() {
+
+        const page =
+            sessionStorage.getItem(
+                "voiceReadPage"
+            );
+
+
+        if (!page) {
+
+            return;
+
+        }
+
+
+        // Remove immediately
+
+        sessionStorage.removeItem(
+            "voiceReadPage"
         );
 
 
-        // ----------------------------------------
+        const lang =
+            getLanguageConfig();
+
+
+        // Wait for page content to load
+
+        await new Promise(
+            resolve => {
+
+                setTimeout(
+                    resolve,
+                    1800
+                );
+
+            }
+        );
+
+
+        // ====================================================
         // HOME
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("home") ||
-            command.includes("go home") ||
-            command.includes("main page")
-        ) {
+        if (page === "home") {
 
-            respondAndNavigate(
-                "Opening the home page.",
-                "/"
+            speak(
+                lang.homeDescription
             );
-
-            return;
 
         }
 
 
-        // ----------------------------------------
+        // ====================================================
         // GAMES
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("game") ||
-            command.includes("games")
-        ) {
+        else if (page === "games") {
 
-            respondAndNavigate(
-                "Opening your brain games.",
-                "/games"
+            speak(
+                lang.gamesDescription
             );
-
-            return;
 
         }
 
 
-        // ----------------------------------------
+        // ====================================================
         // REMINDERS
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("reminder") ||
-            command.includes("reminders")
-        ) {
+        else if (page === "reminders") {
 
-            respondAndNavigate(
-                "Opening your reminders.",
-                "/reminders"
-            );
-
-            return;
+            await readReminders();
 
         }
 
 
-        // ----------------------------------------
+        // ====================================================
         // ACTIVITIES
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("activity") ||
-            command.includes("activities")
-        ) {
+        else if (page === "activities") {
 
-            respondAndNavigate(
-                "Opening your activities.",
-                "/activities"
-            );
-
-            return;
+            await readActivities();
 
         }
 
 
-        // ----------------------------------------
+        // ====================================================
         // PROGRESS
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("progress") ||
-            command.includes("performance") ||
-            command.includes("my progress")
-        ) {
+        else if (page === "progress") {
 
-            respondAndNavigate(
-                "Opening your progress.",
-                "/progress"
-            );
-
-            return;
+            await readProgress();
 
         }
 
 
-        // ----------------------------------------
+        // ====================================================
         // PROFILE
-        // ----------------------------------------
+        // ====================================================
 
-        if (
-            command.includes("profile") ||
-            command.includes("my profile")
-        ) {
+        else if (page === "profile") {
 
-            respondAndNavigate(
-                "Opening your profile.",
-                "/profile"
+            speak(
+                lang.profileDescription
             );
 
-            return;
-
         }
-
-
-        // ----------------------------------------
-        // HELP
-        // ----------------------------------------
-
-        if (
-            command.includes("help") ||
-            command.includes("what can you do")
-        ) {
-
-            const message =
-                "You can ask me to open games, reminders, activities, progress, profile, or home.";
-
-
-            status.textContent =
-                "💡 Try saying: Open Games";
-
-
-            speak(message);
-
-
-            return;
-
-        }
-
-
-        // ----------------------------------------
-        // GREETING
-        // ----------------------------------------
-
-        if (
-            command.includes("hello") ||
-            command.includes("hi")
-        ) {
-
-            const message =
-                "Hello! How can I help you today?";
-
-
-            status.textContent =
-                "😊 Hello! How can I help you?";
-
-
-            speak(message);
-
-
-            return;
-
-        }
-
-
-        // ----------------------------------------
-        // UNKNOWN COMMAND
-        // ----------------------------------------
-
-        const message =
-            "Sorry, I did not understand that. You can say open games, open reminders, or ask for help.";
-
-
-        status.textContent =
-            "🤔 I didn't understand. Try saying: Open Games";
-
-
-        speak(message);
 
     }
 
 
-    // ============================================
-    // SPEAK + NAVIGATE
-    // ============================================
+    // ========================================================
+    // READ PROGRESS
+    // ========================================================
 
-    function respondAndNavigate(
-        message,
-        url
-    ) {
+    async function readProgress() {
 
-        status.textContent =
-            "🤖 " + message;
+        const lang =
+            getLanguageConfig();
 
 
-        speak(message);
+        try {
+
+            const response =
+                await fetch(
+                    "/api/progress"
+                );
 
 
-        // Give the assistant time to speak
+            const data =
+                await response.json();
 
-        setTimeout(() => {
 
-            window.location.href =
-                url;
+            const games =
+                Math.round(
+                    Number(
+                        data.games_played || 0
+                    )
+                );
 
-        }, 1800);
+
+            const accuracy =
+                Math.round(
+                    Number(
+                        data.average_accuracy || 0
+                    )
+                );
+
+
+            const best =
+                Math.round(
+                    Number(
+                        data.best_score || 0
+                    )
+                );
+
+
+            if (
+                getCurrentLanguage() === "en"
+            ) {
+
+                speak(
+
+                    `Welcome to your Progress page. ` +
+
+                    `You have played ${games} games. ` +
+
+                    `Your average accuracy is ${accuracy} percent. ` +
+
+                    `Your best score is ${best} percent. ` +
+
+                    `${data.recommendation_message}`
+
+                );
+
+            }
+
+            else {
+
+                speak(
+                    lang.profileDescription
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Progress error:",
+                error
+            );
+
+        }
 
     }
 
 
-    // ============================================
-    // INITIAL GREETING
-    // ============================================
+    // ========================================================
+    // READ ACTIVITIES
+    // ========================================================
 
-    console.log(
-        "Voice Assistant ready!"
-    );
+    async function readActivities() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/activities"
+                );
+
+
+            const activities =
+                await response.json();
+
+
+            if (
+                !activities.length
+            ) {
+
+                speak(
+                    "Welcome to Activities. You have no activities yet. You can add a daily activity."
+                );
+
+                return;
+
+            }
+
+
+            let message =
+                "Welcome to Daily Activities. " +
+
+                `You have ${activities.length} activities. `;
+
+
+            activities.forEach(
+                function (
+                    activity,
+                    index
+                ) {
+
+                    message +=
+
+                        `Activity ${index + 1}: ` +
+
+                        `${activity.activity_name}, ` +
+
+                        `scheduled at ${activity.scheduled_time}. `;
+
+                }
+            );
+
+
+            speak(
+                message
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Activities error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // READ REMINDERS
+    // ========================================================
+
+    async function readReminders() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/reminders"
+                );
+
+
+            const reminders =
+                await response.json();
+
+
+            if (
+                !reminders.length
+            ) {
+
+                speak(
+                    "Welcome to Reminders. You have no reminders yet. You can add a reminder for important daily tasks."
+                );
+
+                return;
+
+            }
+
+
+            let message =
+                "Welcome to your Reminders page. " +
+
+                `You have ${reminders.length} reminders. `;
+
+
+            reminders.forEach(
+                function (
+                    reminder,
+                    index
+                ) {
+
+                    message +=
+
+                        `Reminder ${index + 1}: ` +
+
+                        `${reminder.title}, ` +
+
+                        `at ${reminder.reminder_time}. `;
+
+                }
+            );
+
+
+            speak(
+                message
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Reminder error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // AUTOMATICALLY READ PAGE AFTER VOICE NAVIGATION
+    // ========================================================
+
+    readCurrentPage();
 
 });

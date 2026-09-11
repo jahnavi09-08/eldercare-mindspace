@@ -4,66 +4,124 @@
 {% block content %}
 
 <section class="hero">
+
     <div>
-        <p class="eyebrow">WELCOME BACK</p>
-        <h1>Hello {{ user.name }}!</h1>
-        <p class="hero-text">
+
+        <p class="eyebrow" data-translate="welcomeBack">
+            WELCOME BACK
+        </p>
+
+        <h1>
+            <span data-translate="homeGreeting">Hello!</span>
+            {{ user.name }}
+        </h1>
+
+        <p
+            class="hero-text"
+            data-translate="homeHeroText"
+        >
             Let's make today a little brighter with a few simple activities.
         </p>
+
     </div>
 
+
     <div class="mood-card">
-        <p>How are you feeling?</p>
+
+        <p data-translate="feelingQuestion">
+            How are you feeling?
+        </p>
+
         <div class="moods">
+
             <button>😊</button>
             <button>😐</button>
             <button>😔</button>
+
         </div>
+
     </div>
+
 </section>
 
 
 <section class="featured-game">
-    <div class="featured-icon">🧠</div>
+
+    <div class="featured-icon">
+        🧠
+    </div>
+
 
     <div class="featured-copy">
-        <p class="eyebrow">TODAY'S BRAIN EXERCISE</p>
-        <h2>Sequence Memory</h2>
 
-        <p>
+        <p
+            class="eyebrow"
+            data-translate="todayBrainExercise"
+        >
+            TODAY'S BRAIN EXERCISE
+        </p>
+
+        <h2 data-translate="sequenceMemory">
+            Sequence Memory
+        </h2>
+
+        <p data-translate="sequenceDescription">
             Remember a short sequence of blocks and repeat it.
         </p>
 
-        <a class="primary-button"
-           href="{{ url_for('game', game_name='sequence') }}">
+        <a
+            class="primary-button"
+            href="{{ url_for('game', game_name='sequence') }}"
+            data-translate="startGame"
+        >
             Start Game →
         </a>
+
     </div>
+
 </section>
 
 
 <section class="section">
 
     <div class="section-heading">
+
         <div>
-            <p class="eyebrow">TODAY</p>
-            <h2>Your plan</h2>
+
+            <p
+                class="eyebrow"
+                data-translate="today"
+            >
+                TODAY
+            </p>
+
+            <h2 data-translate="yourPlan">
+                Your plan
+            </h2>
+
         </div>
 
-        <a href="{{ url_for('reminders') }}">
+
+        <a
+            href="{{ url_for('reminders') }}"
+            data-translate="seeAll"
+        >
             See all →
         </a>
+
     </div>
 
 
     <div class="dashboard-grid">
 
-        <!-- NEXT REMINDER -->
+
         <article class="info-card">
 
             <div class="card-icon">⏰</div>
 
-            <h3>Next Reminder</h3>
+            <h3 data-translate="nextReminder">
+                Next Reminder
+            </h3>
 
             {% if next_reminder %}
 
@@ -77,11 +135,11 @@
 
             {% else %}
 
-                <strong>
+                <strong data-translate="noReminders">
                     No reminders
                 </strong>
 
-                <p>
+                <p data-translate="noRemindersText">
                     You don't have any reminders yet.
                 </p>
 
@@ -90,12 +148,13 @@
         </article>
 
 
-        <!-- ACTIVITY -->
         <article class="info-card">
 
             <div class="card-icon">🏃</div>
 
-            <h3>Activity</h3>
+            <h3 data-translate="activity">
+                Activity
+            </h3>
 
             {% if next_activity %}
 
@@ -109,11 +168,11 @@
 
             {% else %}
 
-                <strong>
+                <strong data-translate="noActivity">
                     No activity planned
                 </strong>
 
-                <p>
+                <p data-translate="noActivityText">
                     Add a gentle activity for today.
                 </p>
 
@@ -122,12 +181,13 @@
         </article>
 
 
-        <!-- PROGRESS -->
         <article class="info-card">
 
             <div class="card-icon">📊</div>
 
-            <h3>Progress</h3>
+            <h3 data-translate="progressTitle">
+                Progress
+            </h3>
 
             {% if progress %}
 
@@ -141,11 +201,11 @@
 
             {% else %}
 
-                <strong>
+                <strong data-translate="startJourney">
                     Start your journey!
                 </strong>
 
-                <p>
+                <p data-translate="startJourneyText">
                     Play a game to begin tracking progress.
                 </p>
 
@@ -163,8 +223,18 @@
     <div class="section-heading">
 
         <div>
-            <p class="eyebrow">EXPLORE</p>
-            <h2>What would you like to do?</h2>
+
+            <p
+                class="eyebrow"
+                data-translate="explore"
+            >
+                EXPLORE
+            </p>
+
+            <h2 data-translate="whatWouldYouLike">
+                What would you like to do?
+            </h2>
+
         </div>
 
     </div>
@@ -172,64 +242,73 @@
 
     <div class="quick-grid">
 
-        <a class="quick-card"
-           href="{{ url_for('games') }}">
+
+        <a
+            class="quick-card"
+            href="{{ url_for('games') }}"
+        >
 
             <span>🧠</span>
 
-            <strong>
+            <strong data-translate="playGame">
                 Play a Game
             </strong>
 
-            <small>
+            <small data-translate="exerciseMemory">
                 Exercise your memory
             </small>
 
         </a>
 
 
-        <a class="quick-card"
-           href="{{ url_for('reminders') }}">
+        <a
+            class="quick-card"
+            href="{{ url_for('reminders') }}"
+        >
 
             <span>⏰</span>
 
-            <strong>
+            <strong data-translate="viewReminders">
                 View Reminders
             </strong>
 
-            <small>
+            <small data-translate="stayOnTrack">
                 Stay on track
             </small>
 
         </a>
 
 
-        <a class="quick-card"
-           href="{{ url_for('activities') }}">
+        <a
+            class="quick-card"
+            href="{{ url_for('activities') }}"
+        >
 
             <span>🚶</span>
 
-            <strong>
+            <strong data-translate="dailyActivity">
                 Daily Activity
             </strong>
 
-            <small>
+            <small data-translate="moveGently">
                 Move gently
             </small>
 
         </a>
 
 
-        <a class="quick-card"
-           href="{{ url_for('progress') }}">
+        <a
+            class="quick-card"
+            href="{{ url_for('progress') }}"
+        >
 
             <span>📈</span>
 
-            <strong>
+            <strong data-translate="myProgress">
                 My Progress
             </strong>
 
-            <small>
+            <small data-translate="seeJourney">
                 See your journey
             </small>
 

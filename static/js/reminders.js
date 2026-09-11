@@ -1,11 +1,57 @@
-/* =========================================================
+\/* =========================================================
    MINDSPACE - REMINDERS
+   MULTI-LANGUAGE SUPPORT
    ========================================================= */
 
 
 /* =========================================================
+   GET CURRENT LANGUAGE
+   ========================================================= */
+
+function getCurrentLanguage() {
+
+    return localStorage.getItem("mindspaceLanguage") || "en";
+
+}
+
+
+/* =========================================================
+   GET TRANSLATION
+   ========================================================= */
+
+function t(key) {
+
+    const language = getCurrentLanguage();
+
+    if (
+        typeof translations !== "undefined" &&
+        translations[language] &&
+        translations[language][key]
+    ) {
+
+        return translations[language][key];
+
+    }
+
+
+    if (
+        typeof translations !== "undefined" &&
+        translations.en &&
+        translations.en[key]
+    ) {
+
+        return translations.en[key];
+
+    }
+
+
+    return key;
+
+}
+
+
+/* =========================================================
    ESCAPE HTML
-   Prevents text from breaking the page layout
    ========================================================= */
 
 function escapeHTML(text) {
@@ -41,6 +87,34 @@ function getReminderIcon(type) {
 
 
 /* =========================================================
+   TRANSLATE REMINDER TYPE
+   ========================================================= */
+
+function getTranslatedReminderType(type) {
+
+    const typeKeys = {
+
+        Health: "health",
+        Activity: "reminderActivity",
+        Wellness: "wellness",
+        Brain: "brainExerciseOption"
+
+    };
+
+
+    if (typeKeys[type]) {
+
+        return t(typeKeys[type]);
+
+    }
+
+
+    return escapeHTML(type || "Reminder");
+
+}
+
+
+/* =========================================================
    LOAD REMINDERS
    ========================================================= */
 
@@ -51,7 +125,9 @@ async function loadReminders() {
 
 
     if (!list) {
+
         return;
+
     }
 
 
@@ -74,9 +150,9 @@ async function loadReminders() {
             await response.json();
 
 
-        /* -------------------------------------------------
+        /* =============================================
            EMPTY STATE
-           ------------------------------------------------- */
+           ============================================= */
 
         if (!reminders || reminders.length === 0) {
 
@@ -84,17 +160,21 @@ async function loadReminders() {
 
                 <div class="empty-reminders">
 
-                    <div style="font-size: 40px; margin-bottom: 10px;">
+                    <div
+                        style="
+                            font-size: 40px;
+                            margin-bottom: 10px;
+                        "
+                    >
                         🔔
                     </div>
 
                     <strong>
-                        No reminders yet
+                        ${t("noReminders")}
                     </strong>
 
                     <p style="margin-top: 8px;">
-                        Add a reminder below to help
-                        remember important things.
+                        ${t("noRemindersText")}
                     </p>
 
                 </div>
@@ -106,9 +186,9 @@ async function loadReminders() {
         }
 
 
-        /* -------------------------------------------------
+        /* =============================================
            DISPLAY REMINDERS
-           ------------------------------------------------- */
+           ============================================= */
 
         list.innerHTML =
             reminders.map(item => {
@@ -122,19 +202,27 @@ async function loadReminders() {
                     getReminderIcon(item.type);
 
 
+                const translatedType =
+                    getTranslatedReminderType(
+                        item.type
+                    );
+
+
                 return `
 
-                    <article
-                        class="reminder-card"
-                    >
+                    <article class="reminder-card">
+
 
                         <!-- REMINDER INFORMATION -->
 
                         <div class="reminder-info">
 
                             <h3>
+
                                 ${icon}
+
                                 ${escapeHTML(item.title)}
+
                             </h3>
 
 
@@ -145,9 +233,11 @@ async function loadReminders() {
                                     ? `
 
                                         <p>
+
                                             ${escapeHTML(
                                                 item.description
                                             )}
+
                                         </p>
 
                                     `
@@ -157,11 +247,10 @@ async function loadReminders() {
                             }
 
 
-                            <p
-                                class="reminder-time"
-                            >
+                            <p class="reminder-time">
 
                                 ⏰
+
                                 ${escapeHTML(
                                     item.reminder_time
                                 )}
@@ -172,16 +261,13 @@ async function loadReminders() {
                             <p>
 
                                 ${
+
                                     completed
 
-                                        ? "✅ Completed"
+                                        ? `✅ ${t("completed")}`
 
-                                        : `🔔 ${
-                                            escapeHTML(
-                                                item.type ||
-                                                "Reminder"
-                                            )
-                                        }`
+                                        : `🔔 ${translatedType}`
+
                                 }
 
                             </p>
@@ -192,6 +278,7 @@ async function loadReminders() {
                         <!-- MARK DONE BUTTON -->
 
                         <button
+
                             type="button"
 
                             class="
@@ -214,14 +301,17 @@ async function loadReminders() {
                                     ? "disabled"
                                     : ""
                             }
+
                         >
 
                             ${
+
                                 completed
 
-                                    ? "✓ Completed"
+                                    ? `✓ ${t("completed")}`
 
-                                    : "✓ Mark Done"
+                                    : `✓ ${t("markDone")}`
+
                             }
 
                         </button>
@@ -249,21 +339,22 @@ async function loadReminders() {
 
                 <div
                     style="
-                        font-size:40px;
-                        margin-bottom:10px;
+                        font-size: 40px;
+                        margin-bottom: 10px;
                     "
                 >
                     ⚠️
                 </div>
 
                 <strong>
-                    Unable to load reminders
+
+                    ${t("unableToLoadReminders")}
+
                 </strong>
 
-                <p style="margin-top:8px;">
+                <p style="margin-top: 8px;">
 
-                    Please refresh the page
-                    and try again.
+                    ${t("refreshAndTryAgain")}
 
                 </p>
 
@@ -305,8 +396,6 @@ async function completeReminder(id) {
         }
 
 
-        /* Reload the reminder list */
-
         await loadReminders();
 
 
@@ -320,7 +409,7 @@ async function completeReminder(id) {
 
 
         alert(
-            "We couldn't update this reminder. Please try again."
+            t("updateReminderError")
         );
 
     }
@@ -347,9 +436,9 @@ if (reminderForm) {
             event.preventDefault();
 
 
-            /* ---------------------------------------------
+            /* =========================================
                GET FORM VALUES
-               --------------------------------------------- */
+               ========================================= */
 
             const title =
                 document
@@ -372,19 +461,21 @@ if (reminderForm) {
 
             const description =
                 document
-                    .getElementById("reminderDescription")
+                    .getElementById(
+                        "reminderDescription"
+                    )
                     .value
                     .trim();
 
 
-            /* ---------------------------------------------
+            /* =========================================
                VALIDATION
-               --------------------------------------------- */
+               ========================================= */
 
             if (!title) {
 
                 alert(
-                    "Please enter a reminder title."
+                    t("enterReminderTitle")
                 );
 
                 return;
@@ -395,7 +486,7 @@ if (reminderForm) {
             if (!reminderTime) {
 
                 alert(
-                    "Please choose a reminder time."
+                    t("chooseReminderTime")
                 );
 
                 return;
@@ -403,9 +494,9 @@ if (reminderForm) {
             }
 
 
-            /* ---------------------------------------------
+            /* =========================================
                PREPARE DATA
-               --------------------------------------------- */
+               ========================================= */
 
             const payload = {
 
@@ -428,23 +519,23 @@ if (reminderForm) {
                     );
 
 
-                /* -----------------------------------------
-                   DISABLE BUTTON WHILE SAVING
-                   ----------------------------------------- */
+                /* =====================================
+                   DISABLE BUTTON
+                   ===================================== */
 
                 if (submitButton) {
 
                     submitButton.disabled = true;
 
                     submitButton.textContent =
-                        "Adding...";
+                        t("adding");
 
                 }
 
 
-                /* -----------------------------------------
-                   SEND TO FLASK
-                   ----------------------------------------- */
+                /* =====================================
+                   SEND TO BACKEND
+                   ===================================== */
 
                 const response =
                     await fetch(
@@ -481,23 +572,23 @@ if (reminderForm) {
                 }
 
 
-                /* -----------------------------------------
+                /* =====================================
                    CLEAR FORM
-                   ----------------------------------------- */
+                   ===================================== */
 
                 reminderForm.reset();
 
 
-                /* -----------------------------------------
+                /* =====================================
                    RELOAD REMINDERS
-                   ----------------------------------------- */
+                   ===================================== */
 
                 await loadReminders();
 
 
-                /* -----------------------------------------
+                /* =====================================
                    SUCCESS MESSAGE
-                   ----------------------------------------- */
+                   ===================================== */
 
                 showReminderSuccess();
 
@@ -512,7 +603,7 @@ if (reminderForm) {
 
 
                 alert(
-                    "We couldn't add the reminder. Please try again."
+                    t("addReminderError")
                 );
 
             }
@@ -529,7 +620,7 @@ if (reminderForm) {
                     submitButton.disabled = false;
 
                     submitButton.innerHTML =
-                        "✓&nbsp; Add Reminder";
+                        `✓ ${t("addReminderButton")}`;
 
                 }
 
@@ -547,8 +638,6 @@ if (reminderForm) {
    ========================================================= */
 
 function showReminderSuccess() {
-
-    /* Remove old success message */
 
     const oldMessage =
         document.querySelector(
@@ -573,7 +662,7 @@ function showReminderSuccess() {
 
     successMessage.innerHTML = `
 
-        ✓ Reminder added successfully!
+        ✓ ${t("reminderAddedSuccessfully")}
 
     `;
 
@@ -597,8 +686,6 @@ function showReminderSuccess() {
     }
 
 
-    /* Automatically remove message */
-
     setTimeout(() => {
 
         successMessage.remove();
@@ -606,6 +693,24 @@ function showReminderSuccess() {
     }, 3000);
 
 }
+
+
+/* =========================================================
+   LANGUAGE CHANGE
+   Reload dynamic reminder content
+   ========================================================= */
+
+document.addEventListener(
+
+    "mindspaceLanguageChanged",
+
+    () => {
+
+        loadReminders();
+
+    }
+
+);
 
 
 /* =========================================================

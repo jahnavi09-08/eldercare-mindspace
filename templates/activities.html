@@ -26,35 +26,60 @@
         ElderCare MindSpace
     </div>
 
+
     <nav class="nav">
 
-        <a href="{{ url_for('home') }}">
+        <a
+            href="{{ url_for('home') }}"
+            data-translate="home"
+        >
             Home
         </a>
 
-        <a href="{{ url_for('games') }}">
+
+        <a
+            href="{{ url_for('games') }}"
+            data-translate="games"
+        >
             Games
         </a>
 
-        <a href="{{ url_for('reminders') }}">
+
+        <a
+            href="{{ url_for('reminders') }}"
+            data-translate="reminders"
+        >
             Reminders
         </a>
 
-        <a href="{{ url_for('progress') }}">
+
+        <a
+            href="{{ url_for('progress') }}"
+            data-translate="progress"
+        >
             Progress
         </a>
 
-        <a href="{{ url_for('activities') }}"
-           style="
+
+        <a
+            href="{{ url_for('activities') }}"
+            data-translate="activities"
+
+            style="
                 background: var(--primary);
                 color: white;
                 border-radius: 12px;
                 padding: 9px 13px;
-           ">
+            "
+        >
             Activities
         </a>
 
-        <a href="{{ url_for('profile') }}">
+
+        <a
+            href="{{ url_for('profile') }}"
+            data-translate="profile"
+        >
             Profile
         </a>
 
@@ -65,17 +90,27 @@
 
 <main class="page-container">
 
+
+    <!-- ========================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================= -->
+
     <section class="page-header">
 
-        <p class="eyebrow">
+        <p
+            class="eyebrow"
+            data-translate="dailyWellness"
+        >
             DAILY WELLNESS
         </p>
 
-        <h1>
+
+        <h1 data-translate="dailyActivities">
             🌱 Daily Activities
         </h1>
 
-        <p>
+
+        <p data-translate="activitiesIntro">
             Simple activities help create a calm,
             familiar and meaningful daily routine.
         </p>
@@ -83,49 +118,79 @@
     </section>
 
 
+    <!-- ========================================= -->
+    <!-- ADD ACTIVITY + INFORMATION -->
+    <!-- ========================================= -->
+
     <section class="two-column">
+
 
         <!-- ADD ACTIVITY -->
 
         <div class="form-card">
 
-            <h2>
+            <h2 data-translate="addDailyActivity">
                 ➕ Add a Daily Activity
             </h2>
 
-            <p style="color: var(--muted);">
+
+            <p
+                style="color: var(--muted);"
+                data-translate="addActivityIntro"
+            >
                 Add something simple to remember and enjoy.
             </p>
 
 
             <form id="activityForm">
 
-                <label for="activityName">
+
+                <!-- ACTIVITY NAME -->
+
+                <label
+                    for="activityName"
+                    data-translate="activityLabel"
+                >
                     Activity
                 </label>
+
 
                 <input
                     id="activityName"
                     type="text"
                     placeholder="Example: Morning Walk"
+                    data-placeholder="activityExample"
                     required
                 >
 
 
-                <label for="activityDuration">
+                <!-- DURATION -->
+
+                <label
+                    for="activityDuration"
+                    data-translate="duration"
+                >
                     Duration
                 </label>
+
 
                 <input
                     id="activityDuration"
                     type="text"
                     placeholder="Example: 15 minutes"
+                    data-placeholder="durationExample"
                 >
 
 
-                <label for="activityScheduledTime">
+                <!-- TIME -->
+
+                <label
+                    for="activityScheduledTime"
+                    data-translate="time"
+                >
                     Time
                 </label>
+
 
                 <input
                     id="activityScheduledTime"
@@ -134,9 +199,12 @@
                 >
 
 
+                <!-- SUBMIT -->
+
                 <button
                     type="submit"
                     class="primary-button"
+                    data-translate="addActivity"
                 >
                     Add Activity
                 </button>
@@ -154,17 +222,20 @@
                 🌼
             </div>
 
-            <h3>
+
+            <h3 data-translate="gentleRoutine">
                 A Gentle Daily Routine
             </h3>
 
-            <p>
+
+            <p data-translate="routineInfo">
                 Familiar activities such as walking,
                 reading, gardening or listening to music
                 can make the day more meaningful.
             </p>
 
-            <p>
+
+            <p data-translate="routineComfort">
                 Keep activities simple and comfortable.
             </p>
 
@@ -173,20 +244,28 @@
     </section>
 
 
-    <!-- ACTIVITIES -->
+    <!-- ========================================= -->
+    <!-- ACTIVITIES LIST -->
+    <!-- ========================================= -->
 
     <section class="section">
 
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">
+
+                <p
+                    class="eyebrow"
+                    data-translate="today"
+                >
                     TODAY
                 </p>
 
-                <h2>
+
+                <h2 data-translate="yourActivities">
                     Your Activities
                 </h2>
+
             </div>
 
         </div>
@@ -196,9 +275,14 @@
             id="activityList"
             class="activity-grid"
         >
-            <div class="loading">
+
+            <div
+                class="loading"
+                data-translate="loadingActivities"
+            >
                 Loading activities...
             </div>
+
         </div>
 
     </section>
@@ -212,12 +296,25 @@
         🌿 ElderCare MindSpace
     </span>
 
-    <span>
-        Supporting healthier minds, one day at a time.
+
+    <span data-translate="footerText">
+        Simple. Calm. Caring.
     </span>
 
 </footer>
 
+
+<!-- ========================================= -->
+<!-- LANGUAGE SYSTEM -->
+<!-- IMPORTANT: MUST LOAD BEFORE ACTIVITIES.JS -->
+<!-- ========================================= -->
+
+<script
+    src="{{ url_for('static', filename='js/language.js') }}"
+></script>
+
+
+<!-- ACTIVITIES JAVASCRIPT -->
 
 <script
     src="{{ url_for('static', filename='js/activities.js') }}"
