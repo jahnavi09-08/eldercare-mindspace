@@ -830,6 +830,7 @@ def passkey_login_verify():
 # LOGOUT
 # =========================================================
 @app.route("/logout")
+
 def logout():
 
     session.clear()

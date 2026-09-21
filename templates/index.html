@@ -47,38 +47,88 @@
 
 <section class="featured-game">
 
+    <section class="featured-game">
+
     <div class="featured-icon">
         🧠
     </div>
 
-
     <div class="featured-copy">
 
-        <p
-            class="eyebrow"
-            data-translate="todayBrainExercise"
-        >
-            TODAY'S BRAIN EXERCISE
+        <p class="eyebrow">
+            RECOMMENDED FOR YOU
         </p>
 
-        <h2 data-translate="sequenceMemory">
-            Sequence Memory
-        </h2>
+        {% if progress and progress.average_accuracy is not none %}
 
-        <p data-translate="sequenceDescription">
-            Remember a short sequence of blocks and repeat it.
-        </p>
+            {% if progress.average_accuracy < 40 %}
 
-        <a
-            class="primary-button"
-            href="{{ url_for('game', game_name='sequence') }}"
-            data-translate="startGame"
-        >
-            Start Game →
-        </a>
+                <h2>Let's practice your memory</h2>
+
+                <p>
+                    A gentle memory exercise can help you stay engaged today.
+                </p>
+
+                <a
+                    class="primary-button"
+                    href="{{ url_for('game', game_name='sequence') }}"
+                >
+                    Start Memory Game →
+                </a>
+
+            {% elif progress.average_accuracy < 70 %}
+
+                <h2>Keep building your memory</h2>
+
+                <p>
+                    You're making progress. Try another memory challenge today.
+                </p>
+
+                <a
+                    class="primary-button"
+                    href="{{ url_for('game', game_name='sequence') }}"
+                >
+                    Continue Practice →
+                </a>
+
+            {% else %}
+
+                <h2>You're doing great! 🌟</h2>
+
+                <p>
+                    Your recent performance is strong. Ready for another challenge?
+                </p>
+
+                <a
+                    class="primary-button"
+                    href="{{ url_for('game', game_name='sequence') }}"
+                >
+                    Take Today's Challenge →
+                </a>
+
+            {% endif %}
+
+        {% else %}
+
+            <h2>Start your memory journey</h2>
+
+            <p>
+                Try a simple memory game and MindSpace will personalize
+                future activities based on your progress.
+            </p>
+
+            <a
+                class="primary-button"
+                href="{{ url_for('game', game_name='sequence') }}"
+            >
+                Start Your First Game →
+            </a>
+
+        {% endif %}
 
     </div>
 
+</section>
 </section>
 
 

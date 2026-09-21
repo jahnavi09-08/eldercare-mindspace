@@ -159,6 +159,65 @@
 
 
     {% block scripts %}{% endblock %}
+    <!-- Emergency Help Button -->
+<button
+    id="emergencyHelpButton"
+    class="emergency-help-button"
+    onclick="openEmergencyHelp()"
+    aria-label="Emergency Help"
+>
+    🚨 Need Help?
+</button>
+
+<!-- Emergency Modal -->
+<div id="emergencyModal" class="emergency-modal">
+
+    <div class="emergency-card">
+
+        <div class="emergency-icon">
+            🚨
+        </div>
+
+        <h2>Do you need help?</h2>
+
+        <p>
+            Choose someone you would like to contact.
+        </p>
+
+        <a
+            href="tel:112"
+            class="emergency-action emergency-call"
+        >
+            🚑 Call Emergency — 112
+        </a>
+
+        <a
+            href="tel:YOUR_CAREGIVER_NUMBER"
+            class="emergency-action"
+        >
+            ❤️ Call Caregiver
+        </a>
+
+        <button
+            class="emergency-cancel"
+            onclick="closeEmergencyHelp()"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+function openEmergencyHelp() {
+    document.getElementById("emergencyModal").style.display = "flex";
+}
+
+function closeEmergencyHelp() {
+    document.getElementById("emergencyModal").style.display = "none";
+}
+</script>
 
 </body>
 

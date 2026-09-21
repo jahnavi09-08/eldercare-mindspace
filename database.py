@@ -32,14 +32,20 @@ def init_db():
     db.executescript(
         """
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            age INTEGER,
-            username TEXT UNIQUE,
-            password_hash TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    age INTEGER,
+    username TEXT UNIQUE,
+    password_hash TEXT,
 
+    caregiver_name TEXT,
+    caregiver_phone TEXT,
+
+    emergency_contact_name TEXT,
+    emergency_contact_phone TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
         CREATE TABLE IF NOT EXISTS game_results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,6 +100,29 @@ def init_db():
         );
         """
     )
+        # =====================================================
+    # EMERGENCY CONTACT FIELDS
+    # =====================================================
+
+    user_columns = [
+        "caregiver_name",
+        "caregiver_phone",
+        "emergency_contact_name",
+        "emergency_contact_phone"
+    ]
+
+    existing_columns = {
+        row["name"]
+        for row in db.execute("PRAGMA table_info(users)").fetchall()
+    }
+
+    for column in user_columns:
+
+        if column not in existing_columns:
+
+            db.execute(
+                f"ALTER TABLE users ADD COLUMN {column} TEXT"
+            )
 
 
     # =====================================================
