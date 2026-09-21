@@ -29,7 +29,6 @@ def init_db():
 
     db = get_db()
 
-
     db.executescript(
         """
         CREATE TABLE IF NOT EXISTS users (
@@ -74,6 +73,23 @@ def init_db():
             duration INTEGER DEFAULT 5,
             scheduled_time TEXT NOT NULL,
             completed INTEGER DEFAULT 0,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+
+
+        CREATE TABLE IF NOT EXISTS passkey_credentials (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            user_id INTEGER NOT NULL,
+
+            credential_id BLOB NOT NULL UNIQUE,
+
+            public_key BLOB NOT NULL,
+
+            sign_count INTEGER DEFAULT 0,
+
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
         """

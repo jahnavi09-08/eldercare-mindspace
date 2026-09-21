@@ -43,6 +43,10 @@
             {% endif %}
 
 
+            <!-- =====================================================
+                 NORMAL LOGIN
+                 ===================================================== -->
+
             <form
                 method="POST"
                 action="{{ url_for('login') }}"
@@ -95,20 +99,102 @@
             </form>
 
 
+            <!-- =====================================================
+                 PASSKEY LOGIN
+                 ===================================================== -->
+
+            <div
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:12px;
+                    margin:22px 0;
+                    color:#999;
+                    font-size:14px;
+                "
+            >
+
+                <span
+                    style="
+                        flex:1;
+                        height:1px;
+                        background:#e5e5e5;
+                    "
+                ></span>
+
+                <span>OR</span>
+
+                <span
+                    style="
+                        flex:1;
+                        height:1px;
+                        background:#e5e5e5;
+                    "
+                ></span>
+
+            </div>
+
+
+            <button
+                type="button"
+                onclick="loginWithPasskey()"
+                style="
+                    width:100%;
+                    padding:14px 18px;
+                    border:none;
+                    border-radius:12px;
+                    background:#eef4ff;
+                    color:#3157a6;
+                    font-size:16px;
+                    font-weight:600;
+                    cursor:pointer;
+                    transition:0.2s;
+                "
+                onmouseover="this.style.background='#dfeaff'"
+                onmouseout="this.style.background='#eef4ff'"
+            >
+                🔑 Sign in with Passkey
+            </button>
+
+
+            <p
+                style="
+                    text-align:center;
+                    font-size:13px;
+                    color:#888;
+                    margin-top:10px;
+                    line-height:1.5;
+                "
+            >
+                Use Face ID, fingerprint or Windows Hello
+                on a supported device.
+            </p>
+
+
+            <!-- =====================================================
+                 DEMO ACCOUNT
+                 ===================================================== -->
+
             <div class="auth-demo">
 
                 <strong>Demo Account</strong>
 
                 <p>
-                    Username: <b>"enter your username"</b>
+                    Username:
+                    <b>"enter your username"</b>
                 </p>
 
                 <p>
-                    Password: <b>"enter your password"</b>
+                    Password:
+                    <b>"enter your password"</b>
                 </p>
 
             </div>
 
+
+            <!-- =====================================================
+                 REGISTER
+                 ===================================================== -->
 
             <div class="auth-register">
 
@@ -125,6 +211,15 @@
         </section>
 
     </main>
+
+
+    <!-- =========================================================
+         PASSKEY JAVASCRIPT
+         ========================================================= -->
+
+    <script
+        src="{{ url_for('static', filename='js/passkey.js') }}"
+    ></script>
 
 </body>
 </html>

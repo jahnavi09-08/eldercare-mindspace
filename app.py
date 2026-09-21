@@ -19,6 +19,23 @@ import os
 from database import init_db, get_db
 from ai_engine import get_ai_recommendation
 
+import base64
+
+from webauthn import (
+    generate_registration_options,
+    verify_registration_response,
+    generate_authentication_options,
+    verify_authentication_response,
+    options_to_json
+)
+
+from webauthn.helpers.structs import (
+    PublicKeyCredentialDescriptor,
+    AuthenticatorSelectionCriteria,
+    ResidentKeyRequirement,
+    UserVerificationRequirement
+)
+
 
 # =========================================================
 # APP CONFIGURATION
@@ -389,9 +406,429 @@ def register():
 
 
 # =========================================================
-# LOGOUT
+# PASSKEY / FACE ID CONFIGURATION
 # =========================================================
 
+# For local testing these defaults are correct.
+# When deployed, set PASSKEY_RP_ID to your domain WITHOUT https://
+# and PASSKEY_ORIGIN to the full https:// URL.
+PASSKEY_RP_ID = os.environ.get(
+    "PASSKEY_RP_ID",
+    "localhost"
+)
+
+PASSKEY_ORIGIN = os.environ.get(
+    "PASSKEY_ORIGIN",
+    "http://localhost:5000"
+)
+
+
+def b64url_encode(data):
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def b64url_decode(data):
+    padding = "=" * (-len(data) % 4)
+    return base64.urlsafe_b64decode(data + padding)
+
+
+# =========================================================
+# PASSKEY REGISTRATION — GET OPTIONS
+# =========================================================
+
+@app.get("/api/passkey/register/options")
+@login_required
+def passkey_register_options():
+
+    user = get_current_user()
+
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "User not found."
+        }), 404
+
+    db = get_db()
+
+    credentials = db.execute(
+        """
+        SELECT credential_id
+        FROM passkey_credentials
+        WHERE user_id = ?
+        """,
+        (user["id"],)
+    ).fetchall()
+
+    db.close()
+
+    exclude_credentials = []
+
+    for credential in credentials:
+        exclude_credentials.append(
+            PublicKeyCredentialDescriptor(
+                id=credential["credential_id"]
+            )
+        )
+
+    options = generate_registration_options(
+        rp_id=PASSKEY_RP_ID,
+        rp_name="Eldercare MindSpace",
+        user_name=user["username"],
+        user_id=str(user["id"]).encode("utf-8"),
+        user_display_name=user["name"],
+        authenticator_selection=AuthenticatorSelectionCriteria(
+            resident_key=ResidentKeyRequirement.PREFERRED,
+            user_verification=UserVerificationRequirement.PREFERRED
+        ),
+        exclude_credentials=exclude_credentials
+    )
+
+    session["passkey_registration_challenge"] = b64url_encode(
+        options.challenge
+    )
+
+    return app.response_class(
+        options_to_json(options),
+        mimetype="application/json"
+    )
+
+
+# =========================================================
+# PASSKEY REGISTRATION — VERIFY
+# =========================================================
+
+@app.post("/api/passkey/register/verify")
+@login_required
+def passkey_register_verify():
+
+    user = get_current_user()
+
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "User not found."
+        }), 404
+
+    data = request.get_json(silent=True) or {}
+
+    challenge_string = session.get(
+        "passkey_registration_challenge"
+    )
+
+    if not challenge_string:
+        return jsonify({
+            "success": False,
+            "message": "Registration session expired. Please try again."
+        }), 400
+
+    try:
+
+        verification = verify_registration_response(
+            credential=data,
+            expected_challenge=b64url_decode(
+                challenge_string
+            ),
+            expected_rp_id=PASSKEY_RP_ID,
+            expected_origin=PASSKEY_ORIGIN
+        )
+
+    except Exception as error:
+
+        print(
+            "Passkey registration error:",
+            error
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Passkey registration failed."
+        }), 400
+
+    db = get_db()
+
+    try:
+
+        db.execute(
+            """
+            INSERT INTO passkey_credentials
+            (
+                user_id,
+                credential_id,
+                public_key,
+                sign_count
+            )
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                user["id"],
+                verification.credential_id,
+                verification.credential_public_key,
+                verification.sign_count
+            )
+        )
+
+        db.commit()
+
+    except Exception as error:
+
+        db.rollback()
+
+        print(
+            "Passkey database error:",
+            error
+        )
+
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Could not save the passkey."
+        }), 400
+
+    db.close()
+
+    session.pop(
+        "passkey_registration_challenge",
+        None
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Passkey registered successfully."
+    })
+
+
+# =========================================================
+# PASSKEY LOGIN — GET OPTIONS
+# =========================================================
+
+@app.post("/api/passkey/login/options")
+def passkey_login_options():
+
+    data = request.get_json(silent=True) or {}
+
+    username = str(
+        data.get("username", "")
+    ).strip().lower()
+
+    if not username:
+
+        return jsonify({
+            "success": False,
+            "message": "Please enter your username first."
+        }), 400
+
+    db = get_db()
+
+    user = db.execute(
+        """
+        SELECT id, name, username
+        FROM users
+        WHERE username = ?
+        """,
+        (username,)
+    ).fetchone()
+
+    if not user:
+
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Username not found."
+        }), 404
+
+    credentials = db.execute(
+        """
+        SELECT credential_id
+        FROM passkey_credentials
+        WHERE user_id = ?
+        """,
+        (user["id"],)
+    ).fetchall()
+
+    db.close()
+
+    if not credentials:
+
+        return jsonify({
+            "success": False,
+            "message": "No passkey is registered for this account."
+        }), 404
+
+    allow_credentials = []
+
+    for credential in credentials:
+
+        allow_credentials.append(
+            PublicKeyCredentialDescriptor(
+                id=credential["credential_id"]
+            )
+        )
+
+    options = generate_authentication_options(
+        rp_id=PASSKEY_RP_ID,
+        allow_credentials=allow_credentials,
+        user_verification=UserVerificationRequirement.PREFERRED
+    )
+
+    session["passkey_authentication_challenge"] = b64url_encode(
+        options.challenge
+    )
+
+    session["passkey_authentication_user_id"] = user["id"]
+
+    return app.response_class(
+        options_to_json(options),
+        mimetype="application/json"
+    )
+
+
+# =========================================================
+# PASSKEY LOGIN — VERIFY
+# =========================================================
+
+@app.post("/api/passkey/login/verify")
+def passkey_login_verify():
+
+    data = request.get_json(silent=True) or {}
+
+    challenge_string = session.get(
+        "passkey_authentication_challenge"
+    )
+
+    user_id = session.get(
+        "passkey_authentication_user_id"
+    )
+
+    if not challenge_string or not user_id:
+
+        return jsonify({
+            "success": False,
+            "message": "Login session expired. Please try again."
+        }), 400
+
+    credential_id = data.get("rawId")
+
+    if not credential_id:
+
+        credential_id = data.get("id")
+
+    if not credential_id:
+
+        return jsonify({
+            "success": False,
+            "message": "Credential ID was not received."
+        }), 400
+
+    try:
+
+        credential_id_bytes = b64url_decode(
+            credential_id
+        )
+
+    except Exception:
+
+        return jsonify({
+            "success": False,
+            "message": "Invalid credential ID."
+        }), 400
+
+    db = get_db()
+
+    credential = db.execute(
+        """
+        SELECT
+            credential_id,
+            public_key,
+            sign_count
+        FROM passkey_credentials
+        WHERE user_id = ?
+        AND credential_id = ?
+        """,
+        (
+            user_id,
+            credential_id_bytes
+        )
+    ).fetchone()
+
+    if not credential:
+
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "This passkey is not registered."
+        }), 404
+
+    try:
+
+        verification = verify_authentication_response(
+            credential=data,
+            expected_challenge=b64url_decode(
+                challenge_string
+            ),
+            expected_rp_id=PASSKEY_RP_ID,
+            expected_origin=PASSKEY_ORIGIN,
+            credential_public_key=credential["public_key"],
+            credential_current_sign_count=credential["sign_count"]
+        )
+
+    except Exception as error:
+
+        print(
+            "Passkey authentication error:",
+            error
+        )
+
+        db.close()
+
+        return jsonify({
+            "success": False,
+            "message": "Passkey authentication failed."
+        }), 401
+
+    db.execute(
+        """
+        UPDATE passkey_credentials
+        SET sign_count = ?
+        WHERE user_id = ?
+        AND credential_id = ?
+        """,
+        (
+            verification.new_sign_count,
+            user_id,
+            credential_id_bytes
+        )
+    )
+
+    db.commit()
+    db.close()
+
+    session.pop(
+        "passkey_authentication_challenge",
+        None
+    )
+
+    session.pop(
+        "passkey_authentication_user_id",
+        None
+    )
+
+    session.clear()
+
+    session["user_id"] = user_id
+
+    return jsonify({
+        "success": True,
+        "message": "Passkey login successful.",
+        "redirect": url_for("home")
+    })
+
+
+# =========================================================
+# LOGOUT
+# =========================================================
 @app.route("/logout")
 def logout():
 
