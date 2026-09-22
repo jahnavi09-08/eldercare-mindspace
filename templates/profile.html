@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Profile | ElderCare MindSpace</title>
 
@@ -12,207 +18,588 @@
     >
 
     <style>
+
+        /* =====================================================
+           PROFILE CARD
+        ===================================================== */
+
         .profile-card {
+
             background: white;
+
             border-radius: 20px;
+
             padding: 30px;
+
             margin-bottom: 24px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+
+            box-shadow:
+                0 4px 14px rgba(0, 0, 0, 0.06);
+
         }
+
+
+        /* =====================================================
+           PROFILE HEADER
+        ===================================================== */
 
         .profile-header {
+
             display: flex;
+
             align-items: center;
+
             gap: 22px;
+
             margin-bottom: 28px;
+
         }
+
 
         .profile-avatar {
+
             width: 90px;
+
             height: 90px;
+
             border-radius: 50%;
+
             background: #e8f3ec;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             font-size: 48px;
+
             flex-shrink: 0;
+
         }
+
 
         .profile-header h1 {
+
             margin: 0 0 6px;
+
         }
+
 
         .profile-header p {
+
             margin: 0;
+
             font-size: 18px;
+
         }
+
+
+        /* =====================================================
+           PROFILE INFORMATION
+        ===================================================== */
 
         .profile-info {
+
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
             gap: 16px;
+
         }
+
 
         .info-box {
+
             background: #f7faf8;
+
             border-radius: 14px;
+
             padding: 18px;
+
         }
+
 
         .info-box span {
+
             display: block;
+
             font-size: 15px;
+
             margin-bottom: 6px;
+
             opacity: 0.75;
+
         }
+
 
         .info-box strong {
+
             font-size: 21px;
+
         }
+
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
 
         .profile-stats {
+
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
             gap: 16px;
+
         }
+
 
         .profile-stat {
+
             background: #f7faf8;
+
             border-radius: 16px;
+
             padding: 20px;
+
             text-align: center;
+
         }
+
 
         .profile-stat .icon {
+
             font-size: 32px;
+
             display: block;
+
             margin-bottom: 8px;
+
         }
+
 
         .profile-stat strong {
+
             display: block;
+
             font-size: 28px;
+
             margin-bottom: 4px;
+
         }
+
 
         .profile-stat span {
+
             font-size: 15px;
+
         }
+
+
+        /* =====================================================
+           RECOMMENDATION
+        ===================================================== */
 
         .recommendation-box {
+
             background: #f1f8f4;
-            border-left: 5px solid #4f8f68;
+
+            border-left:
+                5px solid #4f8f68;
+
             border-radius: 14px;
+
             padding: 22px;
+
         }
+
 
         .recommendation-box h2 {
+
             margin-top: 0;
+
         }
+
 
         .recommendation-box p {
+
             font-size: 17px;
+
             line-height: 1.6;
+
         }
 
-        .profile-message {
-            background: #fff8e8;
-            border-radius: 14px;
-            padding: 20px;
-            font-size: 17px;
-            line-height: 1.6;
+
+        /* =====================================================
+           CARE & EMERGENCY CONTACTS
+        ===================================================== */
+
+        .emergency-contact-card {
+
+            border:
+                1px solid #eadede;
+
         }
+
+
+        .emergency-contact-intro {
+
+            margin-top: 0;
+
+            color: #666;
+
+            font-size: 16px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .contact-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+
+            margin-top: 20px;
+
+        }
+
+
+        .contact-box {
+
+            background: #f9faf9;
+
+            border:
+                1px solid #e5ebe7;
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+        }
+
+
+        .contact-box h3 {
+
+            margin-top: 0;
+
+            margin-bottom: 16px;
+
+        }
+
+
+        .contact-field {
+
+            margin-bottom: 14px;
+
+        }
+
+
+        .contact-field label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: 600;
+
+            font-size: 15px;
+
+        }
+
+
+        .contact-field input {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid #ccd8d0;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+            background: white;
+
+        }
+
+
+        .contact-field input:focus {
+
+            outline: none;
+
+            border-color: #4f8f68;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(79, 143, 104, 0.12);
+
+        }
+
+
+        .save-contact-button {
+
+            margin-top: 20px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 14px 24px;
+
+            background: #4f8f68;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                0.2s ease;
+
+        }
+
+
+        .save-contact-button:hover {
+
+            opacity: 0.92;
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .contact-message {
+
+            margin-top: 14px;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+        }
+
+
+        /* =====================================================
+           PASSKEY SECURITY
+        ===================================================== */
 
         .passkey-card {
-            border: 1px solid #dce9e2;
+
+            border:
+                1px solid #dce9e2;
+
         }
+
 
         .passkey-content {
+
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
             gap: 24px;
+
         }
+
 
         .passkey-content h2 {
+
             margin-top: 0;
+
             margin-bottom: 8px;
+
         }
+
 
         .passkey-content p {
+
             margin: 0;
+
             font-size: 16px;
+
             line-height: 1.6;
+
         }
+
 
         .passkey-button {
+
             border: none;
+
             border-radius: 12px;
+
             padding: 14px 22px;
+
             background: #3157a6;
+
             color: white;
+
             font-size: 16px;
+
             font-weight: 700;
+
             cursor: pointer;
+
             white-space: nowrap;
-            transition: 0.2s ease;
+
+            transition:
+                0.2s ease;
+
         }
+
 
         .passkey-button:hover {
-            transform: translateY(-1px);
+
+            transform:
+                translateY(-1px);
+
             opacity: 0.92;
+
         }
+
 
         .passkey-message {
-            margin: 14px 0 0;
+
+            margin:
+                14px 0 0;
+
             font-size: 15px;
+
             color: #3157a6;
+
         }
 
-        @media (max-width: 600px) {
-            .passkey-content {
-                flex-direction: column;
-                align-items: stretch;
-            }
 
-            .passkey-button {
-                width: 100%;
-            }
+        /* =====================================================
+           ENCOURAGEMENT
+        ===================================================== */
+
+        .profile-message {
+
+            background: #fff8e8;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            font-size: 17px;
+
+            line-height: 1.6;
+
         }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
 
         @media (max-width: 800px) {
+
             .profile-stats {
-                grid-template-columns: repeat(2, 1fr);
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
             }
+
         }
+
+
+        @media (max-width: 700px) {
+
+            .contact-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
 
         @media (max-width: 600px) {
+
             .profile-header {
+
                 flex-direction: column;
+
                 text-align: center;
+
             }
+
 
             .profile-info {
+
                 grid-template-columns: 1fr;
+
             }
+
 
             .profile-stats {
+
                 grid-template-columns: 1fr;
+
             }
+
+
+            .passkey-content {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+
+            .passkey-button {
+
+                width: 100%;
+
+            }
+
         }
+
     </style>
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="site-header">
 
     <div class="container header-inner">
 
-        <a href="{{ url_for('home') }}" class="logo">
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
             🌿 ElderCare MindSpace
         </a>
+
 
         <nav class="main-nav">
 
@@ -220,21 +607,26 @@
                 Home
             </a>
 
+
             <a href="{{ url_for('games') }}">
                 Games
             </a>
+
 
             <a href="{{ url_for('reminders') }}">
                 Reminders
             </a>
 
+
             <a href="{{ url_for('progress') }}">
                 Progress
             </a>
 
+
             <a href="{{ url_for('activities') }}">
                 Activities
             </a>
+
 
             <a
                 href="{{ url_for('profile') }}"
@@ -250,11 +642,21 @@
 </header>
 
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main class="container">
+
+
+    <!-- PAGE HEADER -->
 
     <section class="page-header">
 
-        <h1>👤 My Profile</h1>
+        <h1>
+            👤 My Profile
+        </h1>
 
         <p>
             Your personal information and memory activity summary.
@@ -263,23 +665,36 @@
     </section>
 
 
-    <!-- PROFILE -->
+
+    <!-- =================================================
+         PROFILE INFORMATION
+    ================================================== -->
+
     <section class="profile-card">
 
         <div class="profile-header">
 
+
             <div class="profile-avatar">
+
                 👴
+
             </div>
+
 
             <div>
 
                 <h1 id="userName">
+
                     {{ user.name }}
+
                 </h1>
 
+
                 <p id="userAge">
-                    {{ user.age }} years old    
+
+                    {{ user.age }} years old
+
                 </p>
 
             </div>
@@ -287,11 +702,15 @@
         </div>
 
 
+
         <div class="profile-info">
+
 
             <div class="info-box">
 
-                <span>🌿 Daily Support</span>
+                <span>
+                    🌿 Daily Support
+                </span>
 
                 <strong>
                     Mind & Memory
@@ -299,31 +718,47 @@
 
             </div>
 
+
             <div class="info-box">
 
-                <span>🎯 Recommended Level</span>
+                <span>
+                    🎯 Recommended Level
+                </span>
 
                 <strong id="recommendedDifficulty">
+
                     Easy
+
                 </strong>
 
             </div>
+
 
         </div>
 
     </section>
 
 
-    <!-- STATISTICS -->
+
+    <!-- =================================================
+         MEMORY STATISTICS
+    ================================================== -->
+
     <section class="profile-card">
 
-        <h2>Your Memory Activity</h2>
+        <h2>
+            Your Memory Activity
+        </h2>
+
 
         <div class="profile-stats">
 
+
             <div class="profile-stat">
 
-                <span class="icon">🎮</span>
+                <span class="icon">
+                    🎮
+                </span>
 
                 <strong id="gamesPlayed">
                     0
@@ -336,9 +771,12 @@
             </div>
 
 
+
             <div class="profile-stat">
 
-                <span class="icon">🎯</span>
+                <span class="icon">
+                    🎯
+                </span>
 
                 <strong id="averageAccuracy">
                     0%
@@ -351,9 +789,12 @@
             </div>
 
 
+
             <div class="profile-stat">
 
-                <span class="icon">🏆</span>
+                <span class="icon">
+                    🏆
+                </span>
 
                 <strong id="bestScore">
                     0%
@@ -366,9 +807,12 @@
             </div>
 
 
+
             <div class="profile-stat">
 
-                <span class="icon">📊</span>
+                <span class="icon">
+                    📊
+                </span>
 
                 <strong id="averageScore">
                     0%
@@ -380,82 +824,292 @@
 
             </div>
 
+
         </div>
 
     </section>
 
 
-    <!-- RECOMMENDATION -->
+
+    <!-- =================================================
+         AI / PERSONALIZED RECOMMENDATION
+    ================================================== -->
+
     <section class="profile-card">
 
         <div class="recommendation-box">
 
+
             <h2 id="recommendation">
+
                 Keep practicing
+
             </h2>
 
+
             <p id="recommendationMessage">
+
                 Your personalized recommendation will appear here
                 after you play some games.
+
             </p>
 
+
         </div>
 
     </section>
 
 
-    <!-- PASSKEY SECURITY -->
-    <section class="profile-card passkey-card">
 
-        <div class="passkey-content">
-            <div>
-                <h2>🔐 Secure Sign-In</h2>
-                <p>Use your device's Face ID, fingerprint, or Windows Hello to sign in quickly and securely.</p>
+    <!-- =================================================
+         CARE & EMERGENCY CONTACTS
+    ================================================== -->
+
+    <section class="profile-card emergency-contact-card">
+
+
+        <h2>
+            ❤️ Care & Emergency Contacts
+        </h2>
+
+
+        <p class="emergency-contact-intro">
+
+            Add someone you trust.
+            Their details can be used when you need help.
+
+        </p>
+
+
+
+        <div class="contact-grid">
+
+
+            <!-- CAREGIVER -->
+
+            <div class="contact-box">
+
+                <h3>
+                    ❤️ Caregiver
+                </h3>
+
+
+                <div class="contact-field">
+
+                    <label for="caregiverName">
+                        Caregiver Name
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="caregiverName"
+                        placeholder="Enter caregiver name"
+                    >
+
+                </div>
+
+
+
+                <div class="contact-field">
+
+                    <label for="caregiverPhone">
+                        Caregiver Phone
+                    </label>
+
+
+                    <input
+                        type="tel"
+                        id="caregiverPhone"
+                        placeholder="Enter phone number"
+                    >
+
+                </div>
+
             </div>
 
-            <button type="button" class="passkey-button" onclick="registerPasskey()">
-                🔑 Register Passkey
-            </button>
+
+
+            <!-- EMERGENCY CONTACT -->
+
+            <div class="contact-box">
+
+                <h3>
+                    🚨 Emergency Contact
+                </h3>
+
+
+                <div class="contact-field">
+
+                    <label for="emergencyContactName">
+                        Contact Name
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="emergencyContactName"
+                        placeholder="Enter emergency contact"
+                    >
+
+                </div>
+
+
+
+                <div class="contact-field">
+
+                    <label for="emergencyContactPhone">
+                        Emergency Phone
+                    </label>
+
+
+                    <input
+                        type="tel"
+                        id="emergencyContactPhone"
+                        placeholder="Enter phone number"
+                    >
+
+                </div>
+
+            </div>
+
+
         </div>
 
-        <p id="passkeyMessage" class="passkey-message"></p>
+
+
+        <button
+            type="button"
+            class="save-contact-button"
+            onclick="saveEmergencyContacts()"
+        >
+            💾 Save Contact Details
+        </button>
+
+
+        <p
+            id="contactMessage"
+            class="contact-message"
+        ></p>
+
 
     </section>
 
 
-    <!-- ENCOURAGEMENT -->
+
+    <!-- =================================================
+         PASSKEY SECURITY
+    ================================================== -->
+
+    <section class="profile-card passkey-card">
+
+
+        <div class="passkey-content">
+
+
+            <div>
+
+                <h2>
+                    🔐 Secure Sign-In
+                </h2>
+
+
+                <p>
+
+                    Use your device's Face ID,
+                    fingerprint, or Windows Hello
+                    to sign in quickly and securely.
+
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="passkey-button"
+                onclick="registerPasskey()"
+            >
+
+                🔑 Register Passkey
+
+            </button>
+
+
+        </div>
+
+
+        <p
+            id="passkeyMessage"
+            class="passkey-message"
+        ></p>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         ENCOURAGEMENT
+    ================================================== -->
+
     <section class="profile-card">
+
 
         <div class="profile-message">
 
-            💚 <strong>Keep going!</strong>
+            💚
 
-            <br><br>
+            <strong>
+                Keep going!
+            </strong>
 
-            Every small activity matters. Playing memory games,
-            following daily routines, and staying active can make
+
+            <br>
+            <br>
+
+
+            Every small activity matters.
+            Playing memory games,
+            following daily routines,
+            and staying active can make
             each day more meaningful.
 
         </div>
 
+
     </section>
+
 
 </main>
 
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
 <footer class="site-footer">
 
     <div class="container">
 
         <p>
-            ElderCare MindSpace • Supporting healthy minds
+
+            ElderCare MindSpace •
+            Supporting healthy minds
             through simple daily activities.
+
         </p>
 
     </div>
 
 </footer>
 
+
+
+<!-- =====================================================
+     PROFILE DATA
+===================================================== -->
 
 <script>
 
@@ -466,31 +1120,58 @@ async function loadProfile() {
         const response =
             await fetch("/api/progress");
 
+
         if (!response.ok) {
-            throw new Error("Could not load profile data");
+
+            throw new Error(
+                "Could not load profile data"
+            );
+
         }
+
 
         const data =
             await response.json();
 
 
-        // Statistics
-        document.getElementById("gamesPlayed")
-            .textContent = data.games_played;
 
-        document.getElementById("averageAccuracy")
-            .textContent = `${data.average_accuracy}%`;
+        /* ==============================
+           STATISTICS
+        ============================== */
 
-        document.getElementById("bestScore")
-            .textContent = `${data.best_score}%`;
-
-        document.getElementById("averageScore")
-            .textContent = `${data.average_score}%`;
+        document.getElementById(
+            "gamesPlayed"
+        ).textContent =
+            data.games_played;
 
 
-        // Difficulty
+        document.getElementById(
+            "averageAccuracy"
+        ).textContent =
+            `${data.average_accuracy}%`;
+
+
+        document.getElementById(
+            "bestScore"
+        ).textContent =
+            `${data.best_score}%`;
+
+
+        document.getElementById(
+            "averageScore"
+        ).textContent =
+            `${data.average_score}%`;
+
+
+
+        /* ==============================
+           RECOMMENDED DIFFICULTY
+        ============================== */
+
         const difficulty =
-            data.recommended_difficulty || "easy";
+            data.recommended_difficulty ||
+            "easy";
+
 
         document.getElementById(
             "recommendedDifficulty"
@@ -499,7 +1180,11 @@ async function loadProfile() {
             + difficulty.slice(1);
 
 
-        // Recommendation
+
+        /* ==============================
+           RECOMMENDATION
+        ============================== */
+
         document.getElementById(
             "recommendation"
         ).textContent =
@@ -514,7 +1199,9 @@ async function loadProfile() {
             "Keep practicing regularly.";
 
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Profile loading error:",
@@ -526,13 +1213,138 @@ async function loadProfile() {
 }
 
 
+
 loadProfile();
 
 </script>
 
 
 
+<!-- =====================================================
+     EMERGENCY CONTACT SAVE
+===================================================== -->
+
+<script>
+
+async function saveEmergencyContacts() {
+
+
+    const data = {
+
+        caregiver_name:
+            document
+                .getElementById("caregiverName")
+                .value
+                .trim(),
+
+
+        caregiver_phone:
+            document
+                .getElementById("caregiverPhone")
+                .value
+                .trim(),
+
+
+        emergency_contact_name:
+            document
+                .getElementById("emergencyContactName")
+                .value
+                .trim(),
+
+
+        emergency_contact_phone:
+            document
+                .getElementById("emergencyContactPhone")
+                .value
+                .trim()
+
+    };
+
+
+
+    const message =
+        document.getElementById(
+            "contactMessage"
+        );
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/emergency-contacts",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(data)
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Could not save contacts"
+            );
+
+        }
+
+
+        message.textContent =
+            "✅ Contact details saved successfully.";
+
+
+        message.style.color =
+            "#4f8f68";
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(
+            "Emergency contact error:",
+            error
+        );
+
+
+        message.textContent =
+            "❌ Could not save contact details.";
+
+
+        message.style.color =
+            "#d9534f";
+
+    }
+
+}
+
+</script>
+
+
+
+<!-- =====================================================
+     PASSKEY
+===================================================== -->
+
 <script src="{{ url_for('static', filename='js/passkey.js') }}"></script>
 
+
 </body>
+
 </html>
